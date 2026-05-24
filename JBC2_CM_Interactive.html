@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Judgement Building Clinic 2 — JBC 2</title>
+<style>
+  :root {
+    --purple: #5C2D91;
+    --gold: #F5A623;
+    --dark: #1A0A2E;
+    --dark2: #110718;
+    --card: #1E0A3C;
+    --mid: #7B4FBF;
+    --light: #D8C8F0;
+    --muted: #9070B0;
+    --green: #27AE60;
+    --red: #C0392B;
+    --violet: #8B5CF6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, serif; background: var(--dark); color: white; min-height: 100vh; }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, var(--purple) 0%, #3B1F6B 100%);
+    padding: 16px 28px;
+    border-bottom: 3px solid var(--gold);
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  }
+  .header-sub { font-size: 10px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; font-family: sans-serif; }
+  .header-title { font-size: 20px; font-weight: bold; margin-top: 3px; }
+  .header-tag { font-size: 13px; color: var(--light); font-style: italic; }
+  .badge { background: var(--gold); color: var(--dark); border-radius: 20px; padding: 5px 14px; font-size: 12px; font-family: sans-serif; font-weight: bold; }
+
+  /* ── NAV ── */
+  .nav { background: #0F0620; border-bottom: 1px solid #3B1F6B; display: flex; gap: 2px; overflow-x: auto; padding: 0 12px; }
+  .nav-btn { background: transparent; color: var(--muted); border: none; border-bottom: 3px solid transparent; padding: 11px 13px; cursor: pointer; font-size: 11px; font-family: sans-serif; white-space: nowrap; transition: all 0.2s; }
+  .nav-btn.active { background: var(--purple); color: white; font-weight: bold; border-bottom-color: var(--gold); }
+  .nav-btn:hover:not(.active) { color: var(--light); }
+
+  /* ── CONTENT ── */
+  .content { padding: 28px 20px; max-width: 960px; margin: 0 auto; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 20px; font-weight: bold; color: white; border-bottom: 2px solid var(--gold); padding-bottom: 8px; margin-bottom: 18px; }
+  .section-title.plain { border-bottom-color: #3B1F6B; }
+  .time-tag { display: inline-block; background: var(--gold); color: var(--dark); border-radius: 20px; padding: 4px 14px; font-size: 11px; font-family: sans-serif; font-weight: bold; margin-bottom: 14px; }
+
+  /* ── CARDS ── */
+  .card { background: var(--card); border-radius: 12px; padding: 18px; margin-bottom: 14px; }
+  .card-border { border: 2px solid var(--mid); }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+
+  /* ── TAG ROW ── */
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+  .tag { border-radius: 20px; padding: 3px 10px; font-size: 10px; font-family: sans-serif; border: 1px solid; }
+
+  /* ── AGENDA ── */
+  .agenda-row { display: flex; align-items: center; gap: 14px; padding: 11px 14px; border-left: 4px solid var(--gold); margin-bottom: 3px; border-radius: 0 8px 8px 0; }
+  .agenda-time { min-width: 88px; font-size: 11px; color: var(--gold); font-family: sans-serif; font-weight: bold; }
+  .agenda-label { font-size: 13px; font-family: sans-serif; }
+
+  /* ── 3 A's CARDS ── */
+  .a-card { border-radius: 12px; padding: 18px; cursor: pointer; transition: all 0.3s; border: 2px solid; }
+  .a-card .a-header { border-radius: 8px 8px 0 0; padding: 10px 14px; margin: -18px -18px 14px; font-size: 17px; font-weight: bold; color: white; font-family: Georgia, serif; text-align: center; }
+  .a-card .a-basic { font-size: 12px; color: var(--muted); font-style: italic; font-family: sans-serif; }
+  .a-expanded { border-top: 1px solid; padding-top: 14px; margin-top: 14px; }
+  .prompt-item { font-size: 12px; font-family: sans-serif; color: var(--light); margin-bottom: 5px; padding-left: 10px; border-left: 2px solid; line-height: 1.6; }
+  .warrior-box { border-radius: 6px; padding: 10px; margin-top: 10px; border-left: 3px solid; font-size: 12px; font-family: sans-serif; color: white; line-height: 1.6; }
+
+  /* ── QUIZ ── */
+  .quiz-card { background: var(--card); border: 2px solid #3B1F6B; border-radius: 12px; padding: 20px; margin-bottom: 16px; transition: border-color 0.3s; }
+  .quiz-quote { font-size: 14px; font-style: italic; color: var(--light); line-height: 1.8; border-left: 3px solid var(--mid); padding-left: 14px; margin-bottom: 16px; }
+  .quiz-btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .quiz-btn { border-radius: 8px; padding: 8px 18px; cursor: pointer; font-family: sans-serif; font-size: 13px; font-weight: bold; border: 2px solid #3B1F6B; background: #2D1052; color: var(--muted); transition: all 0.2s; }
+  .quiz-btn:hover { border-color: var(--mid); color: var(--light); }
+  .quiz-btn.correct { background: rgba(39,174,96,0.2); border-color: var(--green); color: var(--green); }
+  .quiz-btn.wrong { background: rgba(192,57,43,0.2); border-color: var(--red); color: #E87070; }
+  .reveal-btn { background: var(--gold); border: none; border-radius: 8px; padding: 8px 20px; cursor: pointer; color: var(--dark); font-family: sans-serif; font-size: 12px; font-weight: bold; }
+  .reveal-box { border-top: 1px solid #3B1F6B; padding-top: 14px; margin-top: 4px; }
+  .tricky-box { background: var(--dark2); border-radius: 8px; padding: 12px; border-left: 3px solid var(--gold); margin-top: 10px; }
+
+  /* ── CIRCLES ── */
+  .circles-visual { position: relative; width: 320px; height: 320px; margin: 0 auto 22px; }
+  .circle-ring { position: absolute; border-radius: 50%; border: 3px solid; cursor: pointer; transition: all 0.3s; }
+  .circle-ring:hover { filter: brightness(1.3); }
+  .circle-labels { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; gap: 22px; }
+  .circle-label { font-size: 9px; font-family: sans-serif; font-weight: bold; letter-spacing: 1px; }
+  .circle-detail { border-radius: 12px; padding: 18px; margin-bottom: 14px; border: 2px solid; }
+  .circle-examples { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; margin-top: 12px; }
+  .circle-example { font-size: 12px; font-family: sans-serif; color: var(--light); background: var(--dark2); border-radius: 6px; padding: 8px 10px; border-left: 3px solid; }
+  .circles-list { display: flex; flex-direction: column; gap: 7px; }
+  .circle-list-btn { border-radius: 8px; padding: 11px 14px; cursor: pointer; text-align: left; color: white; display: flex; align-items: center; gap: 10px; border: 1px solid; background: var(--card); transition: all 0.2s; }
+  .circle-list-btn:hover { filter: brightness(1.2); }
+  .new-badge { font-size: 9px; color: white; border-radius: 20px; padding: 1px 7px; font-family: sans-serif; }
+
+  /* ── CASE STUDIES ── */
+  .case-card { background: var(--card); border: 2px solid #3B1F6B; border-radius: 12px; overflow: hidden; margin-bottom: 14px; transition: border-color 0.3s; }
+  .case-card.open { border-color: var(--gold); }
+  .case-header { padding: 14px 18px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+  .case-num { font-size: 10px; color: var(--gold); font-family: sans-serif; font-weight: bold; letter-spacing: 2px; margin-bottom: 3px; }
+  .case-title { font-size: 17px; font-weight: bold; }
+  .case-body { padding: 0 18px 18px; }
+  .inner-tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+  .inner-tab { border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 11px; font-family: sans-serif; border: 1px solid #3B1F6B; background: var(--dark2); color: var(--muted); text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; }
+  .inner-tab.active { background: var(--purple); border-color: var(--gold); color: white; }
+  .data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .data-stat-card { background: var(--dark2); border: 1px solid var(--mid); border-radius: 10px; padding: 16px; text-align: center; }
+  .data-stat { font-size: 28px; font-weight: bold; color: var(--gold); font-family: sans-serif; margin-bottom: 6px; }
+  .data-label { font-size: 11px; font-family: sans-serif; color: var(--light); line-height: 1.5; }
+  .data-prompt { background: #2D1052; border-radius: 8px; padding: 14px; border-left: 4px solid var(--gold); }
+  .wait-item { font-size: 13px; font-family: sans-serif; color: var(--light); margin-bottom: 10px; padding-left: 12px; border-left: 3px solid var(--gold); line-height: 1.7; }
+  .circle-item { font-size: 13px; font-family: sans-serif; color: var(--light); margin-bottom: 10px; padding-left: 12px; border-left: 3px solid var(--mid); line-height: 1.7; }
+  .mini-tag { background: var(--dark2); border-radius: 8px; padding: 10px; border-top: 3px solid; }
+  .mini-tag-label { font-size: 10px; font-family: sans-serif; font-weight: bold; margin-bottom: 3px; }
+  .mini-tag-val { font-size: 11px; font-family: sans-serif; color: var(--light); line-height: 1.5; }
+
+  /* ── WRITE YOUR OWN ── */
+  .step-nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+  .step-btn { border-radius: 8px; padding: 7px 12px; cursor: pointer; font-size: 11px; font-family: sans-serif; transition: all 0.2s; border: 2px solid #3B1F6B; background: var(--card); color: var(--muted); }
+  .step-btn.active { background: var(--purple); border-color: var(--gold); color: white; }
+  .step-display { background: var(--card); border: 2px solid var(--gold); border-radius: 12px; padding: 22px; margin-bottom: 18px; }
+  .step-num { font-size: 10px; color: var(--gold); font-family: sans-serif; font-weight: bold; letter-spacing: 2px; margin-bottom: 5px; }
+  .step-title { font-size: 20px; font-weight: bold; margin-bottom: 12px; }
+  .step-prompt { font-size: 14px; font-family: sans-serif; color: var(--light); line-height: 1.8; }
+  .step-controls { display: flex; justify-content: space-between; margin-bottom: 22px; }
+  .prev-btn { background: var(--purple); border: none; border-radius: 8px; padding: 9px 18px; cursor: pointer; color: white; font-family: sans-serif; font-size: 12px; }
+  .prev-btn:disabled { background: var(--dark2); color: #555; cursor: default; }
+  .next-btn { background: var(--gold); border: none; border-radius: 8px; padding: 9px 18px; cursor: pointer; color: var(--dark); font-family: sans-serif; font-size: 12px; font-weight: bold; }
+  .next-btn:disabled { background: var(--dark2); color: #555; cursor: default; }
+  .swap-protocol { background: var(--card); border: 1px solid var(--mid); border-radius: 12px; padding: 18px; }
+  .swap-step { display: flex; gap: 10px; margin-bottom: 9px; align-items: flex-start; }
+  .swap-num { min-width: 22px; height: 22px; border-radius: 50%; background: var(--mid); display: flex; align-items: center; justify-content: center; font-size: 11px; font-family: sans-serif; font-weight: bold; color: white; flex-shrink: 0; }
+
+  /* ── CLOSING ── */
+  .closing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 22px; }
+  .closing-card { background: var(--card); border-radius: 10px; padding: 14px; text-align: center; border: 2px solid; }
+  .closing-label { font-size: 15px; font-weight: bold; margin-bottom: 6px; }
+  .closing-prompt { font-size: 11px; font-family: sans-serif; color: var(--muted); line-height: 1.6; }
+  .continue-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+  .continue-card { background: var(--card); border-radius: 10px; padding: 14px; }
+  .footer-banner { text-align: center; padding: 20px; background: linear-gradient(135deg, rgba(92,45,145,0.3), var(--dark)); border-radius: 12px; border: 1px solid var(--gold); margin-top: 22px; }
+
+  /* ── UTILITIES ── */
+  .label-sm { font-size: 12px; color: var(--gold); font-family: sans-serif; font-weight: bold; margin-bottom: 6px; }
+  .label-red { font-size: 11px; color: var(--red); font-family: sans-serif; font-weight: bold; margin-bottom: 6px; }
+  .label-violet { font-size: 11px; color: var(--violet); font-family: sans-serif; font-weight: bold; margin-bottom: 6px; }
+  .body-text { font-size: 13px; font-family: sans-serif; color: var(--light); line-height: 1.7; }
+  .italic-text { font-size: 14px; font-style: italic; color: var(--gold); font-family: Georgia, serif; }
+  .hidden { display: none; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 600px) {
+    .two-col { grid-template-columns: 1fr; }
+    .closing-grid { grid-template-columns: 1fr; }
+    .circles-visual { width: 260px; height: 260px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="header-sub">Teach For America · Pre-Service 2026</div>
+    <div class="header-title">Judgement Building Clinic 2</div>
+    <div class="header-tag">Influence & Impact — How do I value people & community?</div>
+  </div>
+  <div class="badge">⏱ 2 Hours · Virtual</div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nav-btn active" onclick="showSection('welcome', this)">⚔️ Welcome</button>
+  <button class="nav-btn" onclick="showSection('opening', this)">🌱 SEL Opening</button>
+  <button class="nav-btn" onclick="showSection('threeAs', this)">💡 3 A's</button>
+  <button class="nav-btn" onclick="showSection('threeAsGame', this)">🎯 Identify It!</button>
+  <button class="nav-btn" onclick="showSection('circles', this)">⭕ Circles</button>
+  <button class="nav-btn" onclick="showSection('cases', this)">📋 Scenarios</button>
+  <button class="nav-btn" onclick="showSection('write', this)">✍️ Write Your Own</button>
+  <button class="nav-btn" onclick="showSection('debrief', this)">🔄 Debrief</button>
+  <button class="nav-btn" onclick="showSection('closing', this)">🌟 Closing</button>
+</div>
+
+<div class="content">
+
+<!-- ══════════════════════════════════════════════════ WELCOME -->
+<div id="sec-welcome">
+  <div class="section">
+    <div class="section-title">Session Overview</div>
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="card"><div style="font-size:22px;margin-bottom:6px">🎯</div><div class="label-sm">GUIDING QUESTION</div><div class="body-text">How do I value people and community?</div></div>
+      <div class="card"><div style="font-size:22px;margin-bottom:6px">⚔️</div><div class="label-sm">ARMOR FOCUS</div><div class="body-text">BREASTPLATE · SWORD · BOOTS — Listen, Act with Care, Stand for Justice, Speak Truth to Power</div></div>
+      <div class="card"><div style="font-size:22px;margin-bottom:6px">🧠</div><div class="label-sm">SEL FOCUS</div><div class="body-text">Self-Awareness · Social Awareness · Relationship Skills · Responsible Decision-Making</div></div>
+      <div class="card"><div style="font-size:22px;margin-bottom:6px">🌐</div><div class="label-sm">21ST CENTURY SKILLS</div><div class="body-text">Critical Thinking · Collaboration · Communication · Cultural Competency</div></div>
+      <div class="card"><div style="font-size:22px;margin-bottom:6px">🔄</div><div class="label-sm">RJ CONNECTION</div><div class="body-text">Circles of Care · Restorative Dialogue · Community Building as Leadership</div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title plain">2-Hour Agenda</div>
+    <div class="agenda-row" style="background:#1A0A2E"><div class="agenda-time">0:00–0:15</div><div class="agenda-label">Table Setting + SEL Opening</div></div>
+    <div class="agenda-row" style="background:#110718"><div class="agenda-time">0:15–0:25</div><div class="agenda-label">Facilitator Story: Round 1</div></div>
+    <div class="agenda-row" style="background:#1A0A2E"><div class="agenda-time">0:25–0:45</div><div class="agenda-label">Interactive Scenarios — Round 1</div></div>
+    <div class="agenda-row" style="background:#110718"><div class="agenda-time">0:45–0:55</div><div class="agenda-label">3 A's Deep Dive + Identify It! Game</div></div>
+    <div class="agenda-row" style="background:#1A0A2E"><div class="agenda-time">0:55–1:00</div><div class="agenda-label">Brain Break</div></div>
+    <div class="agenda-row" style="background:#110718"><div class="agenda-time">1:00–1:10</div><div class="agenda-label">Facilitator Story: Round 2 + Circles of Influence</div></div>
+    <div class="agenda-row" style="background:#1A0A2E"><div class="agenda-time">1:10–1:30</div><div class="agenda-label">Write Your Own Scenario + Partner Swap</div></div>
+    <div class="agenda-row" style="background:#110718"><div class="agenda-time">1:30–1:45</div><div class="agenda-label">Whole Group Debrief</div></div>
+    <div class="agenda-row" style="background:#1A0A2E"><div class="agenda-time">1:45–2:00</div><div class="agenda-label">3 A's Closing + Continue Your Learning</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ SEL OPENING -->
+<div id="sec-opening" class="hidden">
+  <div class="time-tag">⏱ 0:00 – 0:15</div>
+  <div class="section">
+    <div class="section-title">"Where Are You Living?" — SEL Opening</div>
+    <div class="tag-row">
+      <span class="tag" style="color:#F5A623;border-color:#F5A623;background:rgba(245,166,35,0.1)">⚔️ Armor: BREASTPLATE — Listen & Learn</span>
+      <span class="tag" style="color:#8B5CF6;border-color:#8B5CF6;background:rgba(139,92,246,0.1)">🧠 SEL: Self-Awareness · Social Awareness</span>
+      <span class="tag" style="color:#27AE60;border-color:#27AE60;background:rgba(39,174,96,0.1)">🌐 21C: Communication · Critical Thinking</span>
+      <span class="tag" style="color:#C0392B;border-color:#C0392B;background:rgba(192,57,43,0.1)">🔄 RJ: Community Building</span>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="label-sm">DROP IN CHAT AS YOU ENTER</div>
+      <p class="body-text" style="font-style:italic;color:white;font-size:14px;">"Drop one word: What is something you can CONTROL today — not in your classroom, just in yourself, right now?"</p>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="label-sm" style="margin-bottom:10px">⚡ ACTIVITY: WHERE ARE YOU LIVING? (8 min)</div>
+      <p class="body-text" style="margin-bottom:14px">For each scenario, respond in chat: <strong style="color:var(--gold)">C = Control &nbsp;·&nbsp; I = Influence &nbsp;·&nbsp; CC = Concern</strong></p>
+      <div class="card card-border" style="margin-bottom:8px"><div class="label-sm">SCENARIO 1</div><p class="body-text" style="margin-top:4px;color:white">A scholar hasn't turned in work in 3 days. You don't know why.</p></div>
+      <div class="card card-border" style="margin-bottom:8px"><div class="label-sm">SCENARIO 2</div><p class="body-text" style="margin-top:4px;color:white">Your mentor teacher changed your lesson without telling you — the day of.</p></div>
+      <div class="card card-border"><div class="label-sm">SCENARIO 3</div><p class="body-text" style="margin-top:4px;color:white">The school's grading policy feels unfair and you disagree with it.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ 3 A's DEEP DIVE -->
+<div id="sec-threeAs" class="hidden">
+  <div class="time-tag">⏱ 0:45 – 0:55</div>
+  <div class="section">
+    <div class="section-title">The 3 A's — Deep Dive</div>
+    <p class="body-text" style="margin-bottom:18px">The 3 A's are more than a closing ritual. They are a framework for <strong style="color:white">accountability, gratitude, and growth</strong> — and a restorative justice practice. Click each A to go deeper.</p>
+    <div class="grid-3" id="three-as-grid">
+
+      <div class="a-card" style="background:var(--card);border-color:var(--gold)" onclick="toggleA(0)">
+        <div class="a-header" style="background:var(--gold)">Aha 💡</div>
+        <div class="a-basic">"This was illuminating for me!"</div>
+        <div class="a-expanded hidden" id="a-exp-0">
+          <p class="body-text" style="margin-bottom:12px">An Aha is more than a surprise — it's a moment where your thinking <strong style="color:white">SHIFTS</strong>. You held a belief, and something in this session cracked it open. Name your Ahas specifically because vague insight doesn't transfer to your scholars.</p>
+          <div class="label-sm">DEEPER PROMPTS</div>
+          <div class="prompt-item" style="border-color:var(--gold)">• What did I believe coming in that I'm reconsidering now?</div>
+          <div class="prompt-item" style="border-color:var(--gold)">• What connection did I make that I didn't expect?</div>
+          <div class="prompt-item" style="border-color:var(--gold)">• What does this Aha mean for how I'll show up in my classroom this week?</div>
+          <div style="background:var(--dark2);border-radius:8px;padding:12px;margin-top:12px">
+            <div style="font-size:11px;color:var(--gold);font-family:sans-serif;font-weight:bold">⚔️ ARMOR: HELMET — Hunt for Research · Engage in Continuous Growth</div>
+            <div style="font-size:11px;color:#8B5CF6;font-family:sans-serif;margin-top:3px">🧠 SEL: Self-Awareness</div>
+            <div class="warrior-box" style="background:rgba(245,166,35,0.1);border-color:var(--gold);margin-top:10px"><strong>Warrior Challenge:</strong> Name your Aha AND the scholar who will feel it first.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="a-card" style="background:var(--card);border-color:var(--mid)" onclick="toggleA(1)">
+        <div class="a-header" style="background:var(--mid)">Appreciation 🙏</div>
+        <div class="a-basic">"Showing gratitude to self and/or colleagues"</div>
+        <div class="a-expanded hidden" id="a-exp-1">
+          <p class="body-text" style="margin-bottom:12px">Appreciation is a <strong style="color:white">PRACTICE of power</strong>, not politeness. In communities that have been undervalued, naming what people bring is an act of resistance. When you appreciate a colleague, you are also modeling for your scholars what it looks like to see each other fully.</p>
+          <div class="label-sm">DEEPER PROMPTS</div>
+          <div class="prompt-item" style="border-color:var(--mid)">• Who in this room held space for you today — and have you told them?</div>
+          <div class="prompt-item" style="border-color:var(--mid)">• What did YOU bring today that deserves to be named?</div>
+          <div class="prompt-item" style="border-color:var(--mid)">• How does authentic appreciation build your circles of influence?</div>
+          <div style="background:var(--dark2);border-radius:8px;padding:12px;margin-top:12px">
+            <div style="font-size:11px;color:var(--mid);font-family:sans-serif;font-weight:bold">⚔️ ARMOR: BREASTPLATE — Be Authentic · Act with Care · Listen and Learn</div>
+            <div style="font-size:11px;color:#8B5CF6;font-family:sans-serif;margin-top:3px">🧠 SEL: Relationship Skills · Social Awareness</div>
+            <div class="warrior-box" style="background:rgba(123,79,191,0.15);border-color:var(--mid);margin-top:10px"><strong>Warrior Challenge:</strong> 'Good job' is not appreciation. Name what you saw, heard, or felt — specifically.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="a-card" style="background:var(--card);border-color:#C0392B" onclick="toggleA(2)">
+        <div class="a-header" style="background:#C0392B">Apologies 🛡️</div>
+        <div class="a-basic">"Taking accountability when we don't show up as our best selves"</div>
+        <div class="a-expanded hidden" id="a-exp-2">
+          <p class="body-text" style="margin-bottom:12px">A warrior apology is not self-flagellation — it's <strong style="color:white">accountability WITH a path forward</strong>. 'I'm sorry I was distracted' vs. 'I was distracted and my scholars deserved better. Here's what I'm changing tomorrow.' One closes the loop. One opens a new commitment.</p>
+          <div class="label-sm">DEEPER PROMPTS</div>
+          <div class="prompt-item" style="border-color:#C0392B">• Is there something from this week that you owe yourself an apology for?</div>
+          <div class="prompt-item" style="border-color:#C0392B">• Is there a scholar, colleague, or family who deserves to hear from you?</div>
+          <div class="prompt-item" style="border-color:#C0392B">• What's the MOVE that follows the apology?</div>
+          <div style="background:var(--dark2);border-radius:8px;padding:12px;margin-top:12px">
+            <div style="font-size:11px;color:#C0392B;font-family:sans-serif;font-weight:bold">⚔️ ARMOR: SWORD — Own Your Role as a Change Agent · Respond with Boldness</div>
+            <div style="font-size:11px;color:#8B5CF6;font-family:sans-serif;margin-top:3px">🧠 SEL: Responsible Decision-Making · Self-Management</div>
+            <div class="warrior-box" style="background:rgba(192,57,43,0.15);border-color:#C0392B;margin-top:10px"><strong>Warrior Challenge:</strong> An apology without a commitment is just a statement. What are you committing to?</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="card" style="margin-top:18px;border-left:4px solid var(--mid)">
+      <div class="label-sm">🔄 RJ CONNECTION</div>
+      <p class="body-text">In Restorative Justice, community repair requires naming harm, expressing accountability, and committing to change. <strong style="color:white">Aha</strong> = naming the truth. <strong style="color:white">Appreciation</strong> = honoring what is being rebuilt. <strong style="color:white">Apologies</strong> = accountability WITH a forward commitment. This is warrior work.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ 3 A's GAME -->
+<div id="sec-threeAsGame" class="hidden">
+  <div class="time-tag">⏱ 0:45 – 0:55 (continued)</div>
+  <div class="section">
+    <div class="section-title">3 A's — Identify It! 🎯</div>
+    <p class="body-text" style="margin-bottom:20px">Read each quote. Decide which A this person is holding — then click your answer. Some are tricky on purpose. After you choose, click <strong style="color:var(--gold)">Reveal</strong> to see the explanation.</p>
+
+    <div id="quiz-container"></div>
+
+    <div class="card" style="border-left:4px solid var(--mid);margin-top:4px">
+      <div style="font-size:12px;color:var(--mid);font-family:sans-serif;font-weight:bold;margin-bottom:6px">💬 REFLECT</div>
+      <p class="body-text">"What made some of these hard to identify? What does that tell you about how you might use the 3 A's as a closing routine with your own scholars?"</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ CIRCLES -->
+<div id="sec-circles" class="hidden">
+  <div class="time-tag">⏱ 1:00 – 1:10</div>
+  <div class="section">
+    <div class="section-title">Circles of Influence</div>
+    <div class="tag-row">
+      <span class="tag" style="color:#F5A623;border-color:#F5A623;background:rgba(245,166,35,0.1)">⚔️ BREASTPLATE · BOOTS</span>
+      <span class="tag" style="color:#8B5CF6;border-color:#8B5CF6;background:rgba(139,92,246,0.1)">🧠 Social Awareness · Decision-Making</span>
+      <span class="tag" style="color:#27AE60;border-color:#27AE60;background:rgba(39,174,96,0.1)">🌐 Systems Thinking</span>
+      <span class="tag" style="color:#C0392B;border-color:#C0392B;background:rgba(192,57,43,0.1)">🔄 Understanding Power & Structures</span>
+    </div>
+    <p class="body-text" style="margin-bottom:18px">Right now you are navigating a lot — inside and outside your classroom. This framework gives you a way to sort what's pulling at your attention. We're introducing three circles — and then adding a fourth that most frameworks leave out. <strong style="color:white">Click each circle or button to explore.</strong></p>
+
+    <div class="circles-visual" id="circles-visual">
+      <div class="circle-ring" id="cr-3" style="top:0;left:0;width:320px;height:320px;border-color:#8B5CF6;background:rgba(139,92,246,0.12)" onclick="selectCircle(3)"></div>
+      <div class="circle-ring" id="cr-2" style="top:32px;left:32px;width:256px;height:256px;border-color:#F5A623;background:rgba(245,166,35,0.12)" onclick="selectCircle(2)"></div>
+      <div class="circle-ring" id="cr-1" style="top:70px;left:70px;width:180px;height:180px;border-color:#7B4FBF;background:rgba(123,79,191,0.15)" onclick="selectCircle(1)"></div>
+      <div class="circle-ring" id="cr-0" style="top:105px;left:105px;width:110px;height:110px;border-color:#27AE60;background:rgba(39,174,96,0.2)" onclick="selectCircle(0)"></div>
+      <div class="circle-labels">
+        <div class="circle-label" style="color:#8B5CF6">Ecosystem ✨</div>
+        <div class="circle-label" style="color:#F5A623;margin-top:8px">Concern</div>
+        <div class="circle-label" style="color:#7B4FBF;margin-top:8px">Influence</div>
+        <div class="circle-label" style="color:#27AE60;margin-top:8px">Control</div>
+      </div>
+    </div>
+
+    <div id="circle-detail" class="hidden circle-detail" style="margin-bottom:14px"></div>
+
+    <div class="circles-list">
+      <button class="circle-list-btn" style="border-color:#27AE60" onclick="selectCircle(0)">
+        <div style="width:12px;height:12px;border-radius:50%;background:#27AE60;flex-shrink:0"></div>
+        <div style="font-size:13px;font-family:sans-serif;font-weight:bold;color:#27AE60">Circle of Control</div>
+        <div style="font-size:11px;font-family:sans-serif;color:var(--muted);margin-left:auto">✅ Invest here first</div>
+      </button>
+      <button class="circle-list-btn" style="border-color:#7B4FBF" onclick="selectCircle(1)">
+        <div style="width:12px;height:12px;border-radius:50%;background:#7B4FBF;flex-shrink:0"></div>
+        <div style="font-size:13px;font-family:sans-serif;font-weight:bold;color:#7B4FBF">Circle of Influence</div>
+        <div style="font-size:11px;font-family:sans-serif;color:var(--muted);margin-left:auto">✅ Where leadership grows</div>
+      </button>
+      <button class="circle-list-btn" style="border-color:#F5A623" onclick="selectCircle(2)">
+        <div style="width:12px;height:12px;border-radius:50%;background:#F5A623;flex-shrink:0"></div>
+        <div style="font-size:13px;font-family:sans-serif;font-weight:bold;color:#F5A623">Circle of Concern</div>
+        <div style="font-size:11px;font-family:sans-serif;color:var(--muted);margin-left:auto">⚠️ Don't live here</div>
+      </button>
+      <button class="circle-list-btn" style="border-color:#8B5CF6" onclick="selectCircle(3)">
+        <div style="width:12px;height:12px;border-radius:50%;background:#8B5CF6;flex-shrink:0"></div>
+        <div style="font-size:13px;font-family:sans-serif;font-weight:bold;color:#8B5CF6">The Ecosystem</div>
+        <span class="new-badge" style="background:#8B5CF6">NEW</span>
+        <div style="font-size:11px;font-family:sans-serif;color:var(--muted);margin-left:auto">🔥 Warrior Move — Name it</div>
+      </button>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <div class="label-sm">💬 REFLECT WITH YOUR GROUP</div>
+      <div style="border-left:3px solid var(--gold);padding-left:14px;margin-bottom:8px"><p class="body-text">Where do you find yourself spending the most mental energy right now?</p></div>
+      <div style="border-left:3px solid var(--gold);padding-left:14px;margin-bottom:8px"><p class="body-text">What's one relationship in your Circle of Influence you haven't tapped yet?</p></div>
+      <div style="border-left:3px solid var(--gold);padding-left:14px"><p class="body-text">What does it mean to be a warrior who NAMES the Ecosystem — even when you can't change it alone?</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ CASE STUDIES -->
+<div id="sec-cases" class="hidden">
+  <div class="time-tag">⏱ 0:25 – 0:45</div>
+  <div class="section">
+    <div class="section-title">Interactive Scenarios — Round 1</div>
+    <p class="body-text" style="margin-bottom:18px">Select a scenario, work through the tabs with your breakout group, and record your reflections in your CM Workbook.</p>
+    <div id="cases-container"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ WRITE YOUR OWN -->
+<div id="sec-write" class="hidden">
+  <div class="time-tag">⏱ 1:10 – 1:30</div>
+  <div class="section">
+    <div class="section-title">Write Your Own Scenario + Partner Swap</div>
+    <div class="tag-row">
+      <span class="tag" style="color:#F5A623;border-color:#F5A623;background:rgba(245,166,35,0.1)">⚔️ SWORD — Own Your Role · Speak Truth to Power</span>
+      <span class="tag" style="color:#8B5CF6;border-color:#8B5CF6;background:rgba(139,92,246,0.1)">🧠 Self-Awareness · Decision-Making</span>
+      <span class="tag" style="color:#27AE60;border-color:#27AE60;background:rgba(39,174,96,0.1)">🌐 Creativity · Communication</span>
+    </div>
+    <div class="card" style="margin-bottom:18px">
+      <div class="label-sm">DIRECTIONS</div>
+      <p class="body-text">Work <strong style="color:white">individually (10 min)</strong> using the 5-step scaffold below. Your scenario can be real, anticipated, or imagined — no data required. Then <strong style="color:white">swap with a partner (10 min)</strong> and apply W.A.I.T + Circles to each other's scenario. The author listens silently first.</p>
+    </div>
+    <div class="step-nav" id="step-nav"></div>
+    <div class="step-display" id="step-display"></div>
+    <div class="step-controls">
+      <button class="prev-btn" id="prev-btn" onclick="changeStep(-1)">← Previous</button>
+      <button class="next-btn" id="next-btn" onclick="changeStep(1)">Next →</button>
+    </div>
+    <div class="swap-protocol">
+      <div style="font-size:12px;color:var(--mid);font-family:sans-serif;font-weight:bold;margin-bottom:10px">🔄 PARTNER SWAP PROTOCOL</div>
+      <div class="swap-step"><div class="swap-num">1</div><div class="body-text">Share your scenario — do NOT explain or contextualize it. Let your partner read.</div></div>
+      <div class="swap-step"><div class="swap-num">2</div><div class="body-text">Partner applies W.A.I.T: What are the facts? What assumptions might be present? What questions would you ask?</div></div>
+      <div class="swap-step"><div class="swap-num">3</div><div class="body-text">Partner maps the Circles: Control / Influence / Concern / Ecosystem.</div></div>
+      <div class="swap-step"><div class="swap-num">4</div><div class="body-text">Author listens silently — then responds: "What surprised you about your partner's read?"</div></div>
+      <div class="swap-step"><div class="swap-num">5</div><div class="body-text">Swap roles and repeat.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ DEBRIEF -->
+<div id="sec-debrief" class="hidden">
+  <div class="time-tag">⏱ 1:30 – 1:45</div>
+  <div class="section">
+    <div class="section-title">Whole Group Debrief</div>
+    <div class="card" style="border-left:4px solid var(--gold);margin-bottom:10px"><p class="body-text" style="color:white;font-size:14px">What pitfalls kept showing up — across the scenarios AND your own?</p></div>
+    <div class="card" style="border-left:4px solid var(--gold);margin-bottom:10px"><p class="body-text" style="color:white;font-size:14px">Which relationships are you finding yourself tapping — and which feel underused?</p></div>
+    <div class="card" style="border-left:4px solid var(--gold);margin-bottom:10px"><p class="body-text" style="color:white;font-size:14px">What did it feel like to have someone else read YOUR scenario through curiosity rather than judgment?</p></div>
+    <div class="card" style="border-left:4px solid var(--gold);margin-bottom:10px"><p class="body-text" style="color:white;font-size:14px">What does the data from our scenarios tell you about what your scholars may be carrying?</p></div>
+    <div class="card" style="border-left:4px solid var(--gold)"><p class="body-text" style="color:white;font-size:14px">What does valuing people and community actually <em>look like</em> in your classroom next week? Name a scholar. Name a move.</p></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ CLOSING -->
+<div id="sec-closing" class="hidden">
+  <div class="time-tag">⏱ 1:45 – 2:00</div>
+  <div class="section">
+    <div class="section-title">3 A's Closing</div>
+    <div class="closing-grid">
+      <div class="closing-card" style="border-color:var(--gold)"><div class="closing-label" style="color:var(--gold)">Aha 💡</div><div class="closing-prompt">Name your insight AND the scholar who will feel it first.</div></div>
+      <div class="closing-card" style="border-color:var(--mid)"><div class="closing-label" style="color:var(--mid)">Appreciation 🙏</div><div class="closing-prompt">Name WHAT you're grateful for — specific person, specific moment.</div></div>
+      <div class="closing-card" style="border-color:#C0392B"><div class="closing-label" style="color:#C0392B">Apology 🛡️</div><div class="closing-prompt">"I owe _____ an apology. My next move is _____."</div></div>
+    </div>
+    <div class="section">
+      <div class="section-title plain">Continue Your Learning</div>
+      <div class="continue-grid">
+        <div class="continue-card"><div style="font-size:22px;margin-bottom:5px">🎧</div><div class="label-sm">LISTEN</div><div class="body-text" style="margin-top:3px">Elena Aguilar on Circles of Influence</div><div style="font-size:10px;color:var(--muted);font-family:sans-serif;margin-top:2px">Podcast · Spotify</div></div>
+        <div class="continue-card"><div style="font-size:22px;margin-bottom:5px">📖</div><div class="label-sm">READ</div><div class="body-text" style="margin-top:3px">Teaching is a Human Act — Paulo Freire</div></div>
+        <div class="continue-card"><div style="font-size:22px;margin-bottom:5px">✍️</div><div class="label-sm">REFLECT</div><div class="body-text" style="margin-top:3px">Record your next step in your CM Workbook — we return to it in JBC 3.</div></div>
+        <div class="continue-card"><div style="font-size:22px;margin-bottom:5px">🔁</div><div class="label-sm">PRACTICE</div><div class="body-text" style="margin-top:3px">Try W.A.I.T in ONE challenging moment before JBC 3.</div></div>
+      </div>
+    </div>
+    <div class="footer-banner">
+      <div style="font-size:26px;margin-bottom:6px">⚔️</div>
+      <div style="font-size:15px;font-weight:bold;color:var(--gold)">You came in with a circle.</div>
+      <div style="font-size:13px;font-family:sans-serif;color:var(--light);margin-top:5px">You leave with a sphere — and the warrior moves to expand it.</div>
+      <div style="font-size:10px;font-family:sans-serif;color:var(--muted);margin-top:10px">© 2026 Teach For America · Pre-Service Summer</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script>
+// ── NAV ──────────────────────────────────────────────────────────────────
+const SECTIONS = ['welcome','opening','threeAs','threeAsGame','circles','cases','write','debrief','closing'];
+function showSection(id, btn) {
+  SECTIONS.forEach(s => {
+    const el = document.getElementById('sec-' + s);
+    if (el) el.classList.add('hidden');
+  });
+  const target = document.getElementById('sec-' + id);
+  if (target) target.classList.remove('hidden');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+// ── 3 A's TOGGLE ─────────────────────────────────────────────────────────
+function toggleA(i) {
+  const el = document.getElementById('a-exp-' + i);
+  el.classList.toggle('hidden');
+}
+
+// ── QUIZ DATA ─────────────────────────────────────────────────────────────
+const QUIZ = [
+  { quote: '"I came into this session frustrated with my co-teacher, but working through the activity made me realize I was spending all my energy worrying about things outside my control. That shift — that was everything for me today."', answer: 'aha', explanation: 'This is an AHA — a belief cracked open. The CM names a specific cognitive shift. Aha moments name WHAT changed in their thinking, not just how they feel.', distractor: 'Sounds like Appreciation because they seem grateful — but gratitude isn\'t the center here. The center is the insight.' },
+  { quote: '"I want to thank Destiny for sharing her scenario in our breakout room. She didn\'t have to go there, and it made my reflection so much richer. She helped me see something I couldn\'t see alone."', answer: 'appreciation', explanation: 'This is APPRECIATION — specific, named, and relational. It names a person, a moment, and an impact. Warrior-level appreciation, not a generic "great session."', distractor: 'Could it be an Aha? Only if the CM said what they now understand differently. Appreciation centers the OTHER person, not the idea.' },
+  { quote: '"I have to be honest — I spent the first 20 minutes of this session half-listening because I was stressed about my lesson plan for tomorrow. My group deserved my full presence and I didn\'t give it. I\'m committing to being all-in for JBC 3."', answer: 'apology', explanation: 'This is an APOLOGY — specific accountability + a forward commitment. Notice it doesn\'t stop at "I\'m sorry." It names the harm, who it affected, and what changes. That is the warrior apology structure.', distractor: 'Not an Aha, even though they\'re self-aware. An Aha is about insight gained. An Apology is about accountability owed.' },
+  { quote: '"I never thought about the ECOSYSTEM layer before — how the forces outside the school shape what\'s possible inside it. That connection changed how I\'m thinking about my scholars\' challenges."', answer: 'aha', explanation: 'AHA — a connection made between a new concept (the Ecosystem layer) and a bigger understanding of what shapes scholar behavior. The CM is synthesizing, not just recalling.', distractor: 'Could feel like Appreciation because they liked the idea — but Appreciation centers a person or a moment, not an idea.' },
+  { quote: '"I appreciate myself today. I showed up even though this week has been really hard, I was vulnerable in my breakout room, and I didn\'t give up when the scenario felt too close to home."', answer: 'appreciation', explanation: 'APPRECIATION — directed inward. Warrior appreciation includes appreciating yourself. Naming what you brought, specifically, is just as powerful as appreciating a colleague.', distractor: 'This might feel like an Apology in reverse — but it has no accountability element. It is pure, specific gratitude directed at self.' },
+  { quote: '"I\'ve been labeling scholars before I ask questions. Writing my own scenario made me realize I do this with multiple scholars — not just one. I label first, ask second. That has to change starting tomorrow."', answer: 'aha', explanation: 'AHA — and it transfers directly to classroom practice. The gold standard: the CM names the insight AND what it means for tomorrow. This is what makes an Aha a warrior move.', distractor: 'There\'s an implied Apology here too — but the center is insight, not accountability. If they had said "I owe those scholars an apology," it would shift.' },
+];
+const QUIZ_LABELS = { aha: '💡 Aha', appreciation: '🙏 Appreciation', apology: '🛡️ Apology' };
+const quizState = {};
+
+function buildQuiz() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  QUIZ.forEach((q, i) => {
+    quizState[i] = { chosen: null, revealed: false };
+    container.innerHTML += `
+      <div class="quiz-card" id="qcard-${i}">
+        <div style="font-size:11px;color:var(--gold);font-family:sans-serif;font-weight:bold;letter-spacing:2px;margin-bottom:8px">EXAMPLE ${i+1}</div>
+        <div class="quiz-quote">${q.quote}</div>
+        <div class="quiz-btn-row">
+          <button class="quiz-btn" id="qbtn-${i}-aha" onclick="chooseAnswer(${i},'aha')">💡 Aha</button>
+          <button class="quiz-btn" id="qbtn-${i}-appreciation" onclick="chooseAnswer(${i},'appreciation')">🙏 Appreciation</button>
+          <button class="quiz-btn" id="qbtn-${i}-apology" onclick="chooseAnswer(${i},'apology')">🛡️ Apology</button>
+        </div>
+        <div id="qreveal-row-${i}" class="hidden">
+          <button class="reveal-btn" onclick="revealAnswer(${i})">Reveal Answer + Explanation →</button>
+        </div>
+        <div id="qresult-${i}" class="reveal-box hidden">
+          <div style="font-size:13px;color:#27AE60;font-family:sans-serif;font-weight:bold;margin-bottom:6px" id="qanswer-${i}"></div>
+          <p class="body-text" style="margin-bottom:10px" id="qexpl-${i}"></p>
+          <div class="tricky-box">
+            <div style="font-size:11px;color:var(--gold);font-family:sans-serif;font-weight:bold;margin-bottom:4px">⚠️ TRICKY PART</div>
+            <p class="body-text" id="qdist-${i}"></p>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+
+function chooseAnswer(i, choice) {
+  quizState[i].chosen = choice;
+  const q = QUIZ[i];
+  ['aha','appreciation','apology'].forEach(opt => {
+    const btn = document.getElementById(`qbtn-${i}-${opt}`);
+    btn.classList.remove('correct','wrong');
+    if (opt === choice) btn.classList.add(choice === q.answer ? 'correct' : 'wrong');
+  });
+  document.getElementById(`qreveal-row-${i}`).classList.remove('hidden');
+}
+
+function revealAnswer(i) {
+  const q = QUIZ[i];
+  document.getElementById(`qreveal-row-${i}`).classList.add('hidden');
+  const res = document.getElementById(`qresult-${i}`);
+  res.classList.remove('hidden');
+  document.getElementById(`qanswer-${i}`).textContent = `✅ Answer: ${QUIZ_LABELS[q.answer]}`;
+  document.getElementById(`qexpl-${i}`).textContent = q.explanation;
+  document.getElementById(`qdist-${i}`).textContent = q.distractor;
+  document.getElementById(`qcard-${i}`).style.borderColor = '#27AE60';
+}
+
+// ── CIRCLES ──────────────────────────────────────────────────────────────
+const CIRCLES = [
+  { name: 'Circle of Control', color: '#27AE60', desc: 'Things you can directly control, impact, or change.', examples: ['Your tone and body language','Your lesson preparation','How you regulate your emotions','Your questions and curiosity'], energy: '✅ Positive Energy — Invest here first.' },
+  { name: 'Circle of Influence', color: '#7B4FBF', desc: 'Things you can influence through relationships and collaboration.', examples: ['Conversations with your mentor teacher','Reaching out to families','Feedback on systems and policies','Peer-to-peer learning communities'], energy: '✅ Positive Energy — This is where leadership GROWS.' },
+  { name: 'Circle of Concern', color: '#F5A623', desc: 'Things you care about but have little direct control over.', examples: ['District mandates','A scholar\'s home circumstances','School culture and history','Other people\'s choices'], energy: '⚠️ Negative Energy if you LIVE here — but important to name.' },
+  { name: 'The Ecosystem ✨', color: '#8B5CF6', desc: 'The world BEYOND the school — structures, history, and the forces that shape what\'s possible inside your classroom.', examples: ['Historical inequities in education','Policy environments','Community assets and resources','Structures that shape school culture'], energy: '🔥 Warrior Move — Name it. You can\'t change it alone, but you can REFUSE to be complicit.', isNew: true },
+];
+let selectedCircle = null;
+
+function selectCircle(i) {
+  selectedCircle = selectedCircle === i ? null : i;
+  CIRCLES.forEach((_, idx) => {
+    const ring = document.getElementById('cr-' + idx);
+    if (ring) ring.style.boxShadow = idx === selectedCircle ? `0 0 20px ${CIRCLES[idx].color}88` : 'none';
+  });
+  const det = document.getElementById('circle-detail');
+  if (selectedCircle === null) { det.classList.add('hidden'); return; }
+  const c = CIRCLES[selectedCircle];
+  det.classList.remove('hidden');
+  det.style.borderColor = c.color;
+  det.style.background = 'var(--card)';
+  det.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:17px;font-weight:bold;color:${c.color}">${c.isNew ? `<span style="font-size:10px;background:${c.color};color:white;border-radius:20px;padding:2px 8px;margin-right:8px;font-family:sans-serif">NEW</span>` : ''}${c.name}</div>
+      <div style="font-size:11px;font-family:sans-serif;color:${c.color}">${c.energy}</div>
+    </div>
+    <p class="body-text" style="margin-bottom:12px">${c.desc}</p>
+    <div class="circle-examples">${c.examples.map(ex => `<div class="circle-example" style="border-color:${c.color}">• ${ex}</div>`).join('')}</div>`;
+}
+
+// ── CASE STUDIES ─────────────────────────────────────────────────────────
+const CASES = [
+  {
+    id:1, title:'The Silent Scholar',
+    context:'Week 2 of Practicum. You teach 4th grade ELA. Marcus, a scholar who was engaged and vocal in Week 1, has gone completely silent. He puts his head down, refuses to answer questions, and yesterday walked out of your class without permission.',
+    stakeholders:['Marcus','Mentor Teacher','Marcus\'s Family','School Counselor','You (the CM)'],
+    tension:'You want to support Marcus but feel limited by your Practicum role. The mentor teacher is dismissive. You don\'t know Marcus\'s family yet.',
+    data:[{stat:'74%',label:'of Black boys in U.S. schools report feeling invisible or ignored by teachers (GLSEN, 2019)'},{stat:'1 in 3',label:'scholars who disengage in early elementary never fully re-engage academically (Child Trends, 2022)'},{stat:'3x',label:'Black scholars are 3 times more likely to be referred to the office for "defiance" than white peers for the same behavior (UCLA Civil Rights Project, 2023)'}],
+    dataQ:'What does this data tell you about what Marcus may be carrying — that has nothing to do with your classroom?',
+    wait:['W — What are you actually NOTICING? Separate facts from your story.','A — What assumptions are you making about Marcus? About the mentor teacher?','I — What questions could you ask that come from genuine curiosity?','T — What does leading with curiosity look like here before you take any action?'],
+    circles:['CONTROL: Your tone, your approach to Marcus, your preparation, how you show up','INFLUENCE: Conversation with the mentor teacher, reaching out to family, looping in a counselor','CONCERN: Marcus\'s home life, school-wide culture, district policies'],
+    armor:'BREASTPLATE (Listen & Learn · Make Relationships) + SHIELD (Insist on Scholar Rights)',
+    sel:'Social Awareness · Relationship Skills',
+    skill:'Empathy · Communication · Collaborative Problem-Solving',
+    rj:'Circle of Care — Who does Marcus need around him? How do we repair before we redirect?',
+  },
+  {
+    id:2, title:'The Grade Dispute',
+    context:'Your co-teacher publicly disagrees with a grade you gave a scholar — in front of the class. Later, in the hallway, she tells you that you\'re "too soft" and that scholars need to "earn" their grades. You\'re new. She has 12 years in the building.',
+    stakeholders:['Co-Teacher','The Scholar','Class Community','You (the CM)','Mentor Teacher / Coach'],
+    tension:'Power dynamics — she has institutional authority. You have a different philosophy grounded in scholar success. The scholar witnessed the conflict.',
+    data:[{stat:'67%',label:'of first-year teachers report feeling undermined by veteran colleagues at least once in their first semester (Ingersoll & Strong, 2011)'},{stat:'48%',label:'of scholars who witness unresolved adult conflict in class report decreased sense of safety (Thapa et al., 2013)'},{stat:'2x',label:'Scholars are twice as likely to disengage when they perceive grading as arbitrary or disconnected from their effort (Brookhart, 2017)'}],
+    dataQ:'The scholar in this scenario saw the conflict. What does the data tell you about the urgency of repairing that moment — separate from your relationship with the co-teacher?',
+    wait:['W — What do you KNOW for certain? What are you adding emotionally?','A — Are you assuming her intent? What might explain her perspective?','I — What genuine questions could open a real conversation with her?','T — What does curiosity-first look like when you feel disrespected?'],
+    circles:['CONTROL: How you regulate yourself, how you follow up with the scholar, your grading rationale','INFLUENCE: A restorative conversation with the co-teacher, raising it with your coach','CONCERN: The co-teacher\'s overall philosophy, school grading policy'],
+    armor:'SWORD (Speak Truth to Power · Respond with Boldness) + BREASTPLATE (Stand for Justice)',
+    sel:'Self-Management · Responsible Decision-Making',
+    skill:'Critical Thinking · Communication · Conflict Navigation',
+    rj:'Restorative Dialogue — What harm was done to the scholar in that moment? What does repair look like?',
+  },
+  {
+    id:3, title:'The Family Who Doesn\'t Respond',
+    context:'You\'ve sent three notes home and left two voicemails for Jordan\'s family. Jordan is struggling academically and emotionally. No response. Your coach says to "document your attempts." The mentor teacher says "Some families just don\'t care." That lands wrong with you.',
+    stakeholders:['Jordan','Jordan\'s Family','Mentor Teacher','Your Coach','You (the CM)'],
+    tension:'You\'re starting to internalize the narrative that this family is "absent" — and you catch yourself. You don\'t actually know their circumstances at all.',
+    data:[{stat:'58%',label:'of low-income families report missing school communications due to work schedule conflicts, not disinterest (NCES, 2022)'},{stat:'40%',label:'of families in high-poverty schools report that previous school contact felt punitive, reducing their willingness to respond (Epstein, 2018)'},{stat:'3x',label:'Scholars whose families feel welcomed — not just contacted — are 3x more likely to show academic improvement (Henderson & Mapp, 2002)'}],
+    dataQ:'Before you label this family as "unresponsive" — what does this data tell you about what might actually be happening?',
+    wait:['W — What facts do you have? What story are you building from silence?','A — What assumptions are being made about this family — by others AND by you?','I — What would it look like to genuinely wonder about this family\'s world?','T — What does curiosity look like before you label this family as "unresponsive"?'],
+    circles:['CONTROL: How and when you reach out, the warmth of your communication, your persistence','INFLUENCE: Working with a school liaison, trying a different contact method, asking Jordan directly','CONCERN: The family\'s work schedule, language barriers, past school experiences, home circumstances'],
+    armor:'HELMET (Examine Your Scholars · Make Relationships with Families) + BOOTS (Travel Beyond Closed Doors)',
+    sel:'Social Awareness · Responsible Decision-Making',
+    skill:'Cultural Competency · Critical Thinking · Communication',
+    rj:'Community Building — What does it mean to build trust with a family who may have reason not to trust schools?',
+  },
+];
+const caseTabs = {};
+
+function buildCases() {
+  const container = document.getElementById('cases-container');
+  container.innerHTML = '';
+  CASES.forEach((cs, i) => {
+    caseTabs[i] = 'context';
+    container.innerHTML += `
+      <div class="case-card" id="ccard-${i}">
+        <div class="case-header" onclick="toggleCase(${i})">
+          <div><div class="case-num">SCENARIO ${cs.id}</div><div class="case-title">${cs.title}</div></div>
+          <div style="font-size:18px;color:var(--gold)" id="carrow-${i}">▼</div>
+        </div>
+        <div class="case-body hidden" id="cbody-${i}">
+          <div class="inner-tabs" id="ctabs-${i}">
+            <button class="inner-tab active" onclick="switchTab(${i},'context',this)">📍 Context</button>
+            <button class="inner-tab" onclick="switchTab(${i},'data',this)">📊 Data</button>
+            <button class="inner-tab" onclick="switchTab(${i},'wait',this)">⏸ W.A.I.T</button>
+            <button class="inner-tab" onclick="switchTab(${i},'circles',this)">⭕ Circles</button>
+            <button class="inner-tab" onclick="switchTab(${i},'tags',this)">🏷️ Tags</button>
+          </div>
+          <div id="ctab-content-${i}"></div>
+        </div>
+      </div>`;
+  });
+  CASES.forEach((_, i) => renderCaseTab(i));
+}
+
+function toggleCase(i) {
+  const body = document.getElementById('cbody-' + i);
+  const arrow = document.getElementById('carrow-' + i);
+  const card = document.getElementById('ccard-' + i);
+  const isOpen = !body.classList.contains('hidden');
+  body.classList.toggle('hidden');
+  arrow.textContent = isOpen ? '▼' : '▲';
+  card.classList.toggle('open', !isOpen);
+}
+
+function switchTab(i, tab, btn) {
+  caseTabs[i] = tab;
+  document.querySelectorAll(`#ctabs-${i} .inner-tab`).forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCaseTab(i);
+}
+
+function renderCaseTab(i) {
+  const cs = CASES[i];
+  const tab = caseTabs[i];
+  const el = document.getElementById('ctab-content-' + i);
+  if (tab === 'context') {
+    el.innerHTML = `
+      <div style="background:var(--dark2);border-radius:8px;padding:14px;margin-bottom:12px">
+        <div class="label-sm">THE SITUATION</div>
+        <p class="body-text" style="margin-top:4px;font-size:14px;color:white">${cs.context}</p>
+      </div>
+      <div class="two-col">
+        <div style="background:var(--dark2);border-radius:8px;padding:12px">
+          <div class="label-violet">👥 STAKEHOLDERS</div>
+          ${cs.stakeholders.map(s=>`<div class="body-text" style="margin-bottom:3px">• ${s}</div>`).join('')}
+        </div>
+        <div style="background:var(--dark2);border-radius:8px;padding:12px">
+          <div class="label-red">⚡ THE TENSION</div>
+          <p class="body-text" style="margin-top:4px">${cs.tension}</p>
+        </div>
+      </div>`;
+  } else if (tab === 'data') {
+    el.innerHTML = `
+      <div class="data-grid">${cs.data.map(d=>`<div class="data-stat-card"><div class="data-stat">${d.stat}</div><div class="data-label">${d.label}</div></div>`).join('')}</div>
+      <div class="data-prompt"><div class="label-sm" style="margin-bottom:5px">🔍 DATA DISCUSSION PROMPT</div><p class="body-text">${cs.dataQ}</p></div>`;
+  } else if (tab === 'wait') {
+    el.innerHTML = `<div class="label-sm" style="margin-bottom:12px">⏸ W.A.I.T — Apply Before You Act</div>${cs.wait.map(w=>`<div class="wait-item">${w}</div>`).join('')}`;
+  } else if (tab === 'circles') {
+    el.innerHTML = `<div class="label-sm" style="margin-bottom:12px">⭕ MAP YOUR INFLUENCE</div>${cs.circles.map(c=>`<div class="circle-item">${c}</div>`).join('')}`;
+  } else if (tab === 'tags') {
+    el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+      <div class="mini-tag" style="border-color:var(--gold)"><div class="mini-tag-label" style="color:var(--gold)">⚔️ Armor</div><div class="mini-tag-val">${cs.armor}</div></div>
+      <div class="mini-tag" style="border-color:#8B5CF6"><div class="mini-tag-label" style="color:#8B5CF6">🧠 SEL</div><div class="mini-tag-val">${cs.sel}</div></div>
+      <div class="mini-tag" style="border-color:#27AE60"><div class="mini-tag-label" style="color:#27AE60">🌐 21C</div><div class="mini-tag-val">${cs.skill}</div></div>
+      <div class="mini-tag" style="border-color:#C0392B"><div class="mini-tag-label" style="color:#C0392B">🔄 RJ</div><div class="mini-tag-val">${cs.rj}</div></div>
+    </div>`;
+  }
+}
+
+// ── WRITE YOUR OWN ────────────────────────────────────────────────────────
+const STEPS = [
+  { step:'1', label:'Set the Scene', prompt:'Where are you? Who is involved? What week of Practicum is it — or could it be? This can be real, anticipated, or imagined. (2–3 sentences)', icon:'🏫' },
+  { step:'2', label:'Name the Tension', prompt:'What is the challenge? What two things are pulling against each other? (1–2 sentences)', icon:'⚡' },
+  { step:'3', label:'Name the Stakeholders', prompt:'Who else is affected by this situation beyond you? List at least 3 people — think beyond the obvious.', icon:'👥' },
+  { step:'4', label:'The Trap', prompt:'What is the EASY wrong answer — the response that feels natural in the moment but doesn\'t actually move things forward?', icon:'🪤' },
+  { step:'5', label:'The Warrior Move', prompt:'What does leading with curiosity and influence look like in this scenario? (Keep this to yourself — your partner will find it!)', icon:'⚔️' },
+];
+let currentStep = 0;
+
+function buildSteps() {
+  const nav = document.getElementById('step-nav');
+  nav.innerHTML = STEPS.map((s, i) => `<button class="step-btn${i===0?' active':''}" id="stepbtn-${i}" onclick="goStep(${i})">${s.icon} Step ${s.step}</button>`).join('');
+  renderStep();
+}
+
+function goStep(i) {
+  currentStep = i;
+  document.querySelectorAll('.step-btn').forEach((b, idx) => b.classList.toggle('active', idx === i));
+  renderStep();
+}
+
+function changeStep(dir) {
+  goStep(Math.max(0, Math.min(STEPS.length - 1, currentStep + dir)));
+}
+
+function renderStep() {
+  const s = STEPS[currentStep];
+  document.getElementById('step-display').innerHTML = `
+    <div class="step-num">STEP ${s.step} OF ${STEPS.length}</div>
+    <div class="step-title">${s.icon} ${s.label}</div>
+    <div class="step-prompt">${s.prompt}</div>`;
+  document.getElementById('prev-btn').disabled = currentStep === 0;
+  document.getElementById('next-btn').disabled = currentStep === STEPS.length - 1;
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────
+buildQuiz();
+buildCases();
+buildSteps();
+</script>
+</body>
+</html>
