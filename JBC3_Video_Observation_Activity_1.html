@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>JBC 3 — What Do You See? Video Observation Activity</title>
+<style>
+  :root {
+    --purple: #5C2D91;
+    --gold: #F5A623;
+    --dark: #1A0A2E;
+    --dark2: #110718;
+    --card: #1E0A3C;
+    --mid: #7B4FBF;
+    --light: #D8C8F0;
+    --muted: #9070B0;
+    --green: #27AE60;
+    --red: #C0392B;
+    --violet: #8B5CF6;
+    --teal: #0891B2;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, serif; background: var(--dark); color: white; min-height: 100vh; }
+
+  .header { background: linear-gradient(135deg, var(--purple) 0%, #3B1F6B 100%); padding: 16px 28px; border-bottom: 3px solid var(--gold); }
+  .header-sub { font-size: 10px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; font-family: sans-serif; }
+  .header-title { font-size: 20px; font-weight: bold; margin-top: 3px; }
+  .header-sub2 { font-size: 13px; color: var(--light); font-style: italic; margin-top: 2px; }
+
+  .nav { background: #0F0620; border-bottom: 1px solid #3B1F6B; display: flex; gap: 2px; overflow-x: auto; padding: 0 12px; }
+  .nav-btn { background: transparent; color: var(--muted); border: none; border-bottom: 3px solid transparent; padding: 11px 13px; cursor: pointer; font-size: 11px; font-family: sans-serif; white-space: nowrap; transition: all 0.2s; }
+  .nav-btn.active { background: var(--purple); color: white; font-weight: bold; border-bottom-color: var(--gold); }
+
+  .content { padding: 28px 20px; max-width: 980px; margin: 0 auto; }
+  .hidden { display: none !important; }
+  .section-title { font-size: 20px; font-weight: bold; color: white; border-bottom: 2px solid var(--gold); padding-bottom: 8px; margin-bottom: 18px; }
+  .time-tag { display: inline-block; background: var(--gold); color: var(--dark); border-radius: 20px; padding: 4px 14px; font-size: 11px; font-family: sans-serif; font-weight: bold; margin-bottom: 14px; }
+  .card { background: var(--card); border-radius: 12px; padding: 18px; margin-bottom: 14px; }
+  .body-text { font-size: 13px; font-family: sans-serif; color: var(--light); line-height: 1.7; }
+  .label-gold { font-size: 11px; color: var(--gold); font-family: sans-serif; font-weight: bold; margin-bottom: 6px; letter-spacing: 1px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .tag { border-radius: 20px; padding: 3px 10px; font-size: 10px; font-family: sans-serif; border: 1px solid; }
+
+  /* GROUP SELECTOR */
+  .group-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .group-btn { border-radius: 12px; padding: 20px 16px; cursor: pointer; border: 2px solid; background: var(--card); text-align: center; transition: all 0.3s; }
+  .group-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
+  .group-btn.selected { filter: brightness(1.3); transform: translateY(-2px); }
+  .group-num { font-size: 28px; font-weight: bold; margin-bottom: 6px; }
+  .group-name { font-size: 13px; font-family: sans-serif; color: white; font-weight: bold; margin-bottom: 4px; }
+  .group-primary { font-size: 11px; font-family: sans-serif; margin-top: 4px; }
+
+  /* VIDEO EMBED */
+  .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; margin-bottom: 16px; border: 2px solid var(--mid); }
+  .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 10px; }
+  .video-label { font-size: 11px; color: var(--muted); font-family: sans-serif; text-align: center; margin-bottom: 16px; font-style: italic; }
+
+  /* LENS TABS */
+  .lens-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 16px; }
+  .lens-tab { border-radius: 8px; padding: 7px 14px; cursor: pointer; font-size: 11px; font-family: sans-serif; border: 2px solid; background: var(--dark2); color: var(--muted); transition: all 0.2s; font-weight: bold; }
+  .lens-tab.primary-tab { border-width: 2px; }
+  .lens-tab.active { color: white; }
+  .lens-tab .primary-badge { font-size: 8px; background: white; color: var(--dark); border-radius: 10px; padding: 1px 5px; margin-left: 4px; font-weight: bold; vertical-align: middle; }
+
+  /* OBSERVATION GUIDE */
+  .obs-question { background: var(--dark2); border-radius: 8px; padding: 14px; margin-bottom: 10px; border-left: 4px solid; }
+  .obs-q-label { font-size: 10px; font-family: sans-serif; font-weight: bold; letter-spacing: 1px; margin-bottom: 5px; }
+  .obs-q-text { font-size: 13px; font-family: sans-serif; color: white; line-height: 1.6; }
+  .obs-q-sub { font-size: 11px; font-family: sans-serif; color: var(--muted); margin-top: 4px; font-style: italic; }
+
+  /* REPORT OUT */
+  .report-card { border-radius: 12px; padding: 18px; border: 2px solid; margin-bottom: 12px; }
+  .report-title { font-size: 14px; font-weight: bold; margin-bottom: 10px; }
+  .report-prompt { font-size: 13px; font-family: sans-serif; color: var(--light); line-height: 1.7; padding-left: 12px; border-left: 3px solid; margin-bottom: 8px; }
+
+  /* DEBRIEF */
+  .debrief-q { background: var(--card); border-radius: 10px; padding: 14px; border-left: 4px solid var(--gold); margin-bottom: 10px; }
+  .warrior-move { background: linear-gradient(135deg, rgba(92,45,145,0.3), var(--dark)); border: 1px solid var(--gold); border-radius: 12px; padding: 20px; margin-top: 22px; text-align: center; }
+
+  /* OVERVIEW TABLE */
+  .overview-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  .overview-table th { background: var(--purple); color: white; padding: 10px 12px; font-size: 11px; font-family: sans-serif; text-align: left; letter-spacing: 1px; }
+  .overview-table td { padding: 10px 12px; font-size: 12px; font-family: sans-serif; color: var(--light); border-bottom: 1px solid #3B1F6B; line-height: 1.5; }
+  .overview-table tr:nth-child(even) td { background: #1A0A2E; }
+
+  @media (max-width: 600px) {
+    .group-selector { grid-template-columns: 1fr 1fr; }
+    .lens-tabs { gap: 3px; }
+    .lens-tab { font-size: 10px; padding: 5px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-sub">Teach For America · JBC 3 · Pre-Service 2026</div>
+  <div class="header-title">Judgement Building Clinic 3 — What Do You See?</div>
+  <div class="header-sub2">Engaging in Challenging Situations · Video Observation Activity</div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="showSection('overview',this)">📋 Overview</button>
+  <button class="nav-btn" onclick="showSection('emdin',this)">📖 Emdin — Before You Watch</button>
+  <button class="nav-btn" onclick="showSection('group',this)">🎬 My Group's Video</button>
+  <button class="nav-btn" onclick="showSection('reportout',this)">📣 Report Out</button>
+  <button class="nav-btn" onclick="showSection('debrief',this)">🔄 Whole Group Debrief</button>
+  <button class="nav-btn" onclick="showSection('warrior',this)">⚔️ Warrior Move</button>
+</div>
+
+<div class="content">
+
+<!-- ══════════ EMDIN — OPTION A: PRE-READ ══════════ -->
+<div id="sec-emdin" class="hidden">
+  <div class="time-tag">⏱ Option A — Pre-Reading · Before You Watch · 5–7 min</div>
+  <div class="section-title">Teaching Isn't About Managing Behavior</div>
+  <p class="body-text" style="margin-bottom:18px">Before you watch any video today, read this. It's short. It will change what you see.</p>
+
+  <div class="card" style="margin-bottom:14px; border-left: 4px solid var(--gold);">
+    <div class="label-gold">OPTION A — THE PHILOSOPHICAL ANCHOR (Read This First)</div>
+    <p class="body-text" style="margin-top:8px; font-size:14px; line-height:1.8;">
+      In 2001, Dr. Christopher Emdin stood in front of a classroom of Black and Brown scholars in the Bronx and announced he was their teacher. He had practiced his "teacher scowl" in the mirror. He believed success meant a quiet, contained classroom. He kept teaching through 9/11 sirens. He silenced a scholar who asked to call her mother. He ignored Islamophobic slurs hurled at Muslim scholars in his room because — he told himself — his job was to just keep teaching.
+    </p>
+    <p class="body-text" style="margin-top:10px; font-size:14px; line-height:1.8;">
+      Twenty years later, he wrote: <em style="color:var(--gold)">"Looking back now, I realize I was not actually teaching at all."</em>
+    </p>
+    <p class="body-text" style="margin-top:10px; font-size:14px; line-height:1.8;">
+      He calls what he learned <strong style="color:white">Reality Pedagogy</strong> — reaching scholars where they really are, making sure their lives and backgrounds are reflected in the curriculum and classroom. It interrupts the idea that teaching is about managing behavior. Instead, scholars become <strong style="color:white">co-teachers</strong>. The classroom becomes a space for dialogue — even when the schedule says there's no time. Even when the school says there's no space.
+    </p>
+    <p class="body-text" style="margin-top:10px; font-size:14px; line-height:1.8;">
+      <em style="color:var(--gold)">"The best teachers don't just keep teaching. Instead, they use their pedagogy as protest: They disrupt teaching norms that harm vulnerable scholars."</em>
+    </p>
+    <p class="body-text" style="margin-top:10px; font-size:13px; color:var(--muted)">— Dr. Christopher Emdin, "Teaching Isn't About Managing Behavior"</p>
+  </div>
+
+  <div class="card" style="margin-bottom:14px; border-left: 4px solid var(--purple);">
+    <div class="label-gold" style="color:var(--purple); border-color:var(--purple);">OPTION D — THE FRAME FOR EVERYTHING YOU'LL SEE TODAY</div>
+    <p class="body-text" style="margin-top:8px;">Every video you watch today is a window into a teacher navigating a real classroom moment. As you watch, carry this question with you:</p>
+    <div style="background: rgba(92,45,145,0.25); border-radius:10px; padding:16px; margin:12px 0; text-align:center;">
+      <p style="font-size:16px; font-weight:bold; color:white; font-family:sans-serif; margin:0; line-height:1.6;">"Is this teacher managing scholars — or reaching them?"</p>
+    </div>
+    <p class="body-text">The videos, the lenses, the Warrior Move — they all live inside that one question. W.A.I.T is how you slow down enough to reach. Circles is how you expand your reach. What you see on screen today is not a stranger. It's Emdin in 2001. It might be you last Tuesday.</p>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <div style="min-width:26px;height:26px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:12px;font-family:sans-serif;font-weight:bold;color:white;flex-shrink:0">1</div>
+        <p class="body-text"><strong style="color:white">W.A.I.T</strong> — What am I doing? What assumptions am I making? Is curiosity driving me? What does trying look like? This is how Reality Pedagogy begins.</p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <div style="min-width:26px;height:26px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:12px;font-family:sans-serif;font-weight:bold;color:white;flex-shrink:0">2</div>
+        <p class="body-text"><strong style="color:white">Circles of Influence</strong> — Emdin says teachers place "metaphorical knees on the necks" of scholars. What is in your Circle of Control that you're using to manage instead of reach?</p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <div style="min-width:26px;height:26px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:12px;font-family:sans-serif;font-weight:bold;color:white;flex-shrink:0">3</div>
+        <p class="body-text"><strong style="color:white">The ARMOR</strong> — Emdin's 9/11 story is a SHIELD failure. He had the tools to protect his scholars' humanity. He chose the scowl instead. What would SWORD look like in that moment?</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px; border-left: 4px solid #27AE60;">
+    <div class="label-gold" style="color:#27AE60;">OPTION E — WHERE THIS ALL LEADS (REALITY PEDAGOGY AS NORTH STAR)</div>
+    <p class="body-text" style="margin-top:8px;">After today's video analysis, the Warrior Move at the close of this session will ask you to name ONE thing you're committing to before practicum ends. That commitment <em>is</em> your first step into Reality Pedagogy. Here's how the tools you've built across JBC 1, 2, and 3 connect to it:</p>
+    <table class="overview-table" style="margin-top:12px;">
+      <thead>
+        <tr>
+          <th>JBC TOOL</th>
+          <th>HOW IT CONNECTS TO REALITY PEDAGOGY</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:#8B5CF6">W.A.I.T</strong></td>
+          <td>The pause before judgment is the space where co-teaching can begin. You can't hear scholars if you're already reacting.</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#C0392B">Circles of Influence</strong></td>
+          <td>Reality Pedagogy lives in the Circle of Influence — you can't mandate it, you build it through relationship, dialogue, and trust.</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#27AE60">Attention Signals</strong></td>
+          <td>Signals that honor scholar agency — not just compliance — are the entry points. How you get attention tells scholars who you think they are.</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#0891B2">Sincere & Authentic Praise</strong></td>
+          <td>Emdin: scholars need a sense of agency. Praise that sees and names the real scholar — not the compliant one — builds that agency.</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--gold)">The Warrior Move</strong></td>
+          <td>Your Warrior Move today is your first act of Reality Pedagogy. Name the scholar. Name the moment. Name the move. That's where it starts.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="background: rgba(39,174,96,0.15); border-radius:10px; padding:14px; margin-top:14px; text-align:center;">
+      <p style="font-size:13px; color:#27AE60; font-family:sans-serif; font-weight:bold; margin:0 0 6px;">THE DESTINATION</p>
+      <p style="font-size:15px; font-weight:bold; color:white; font-family:sans-serif; margin:0; line-height:1.6;">"The classroom can serve as an example of what the world should look like — all scholars with equal power, regardless of their culture or background — rather than a replication of what it is."</p>
+      <p style="font-size:11px; color:var(--muted); font-family:sans-serif; margin-top:8px;">— Dr. Christopher Emdin</p>
+    </div>
+  </div>
+
+  <div class="card" style="text-align:center; margin-bottom:14px;">
+    <p class="body-text" style="margin-bottom:14px; font-size:15px; color:white; font-weight:bold;">Ready? Take this question into the videos.</p>
+    <div style="background: rgba(212,165,50,0.15); border-radius:10px; padding:14px; margin-bottom:16px; border: 1px solid var(--gold);">
+      <p style="font-size:16px; font-weight:bold; color:var(--gold); font-family:sans-serif; margin:0;">"Is this teacher managing scholars — or reaching them?"</p>
+    </div>
+    <button onclick="showSection('group', document.querySelectorAll('.nav-btn')[2])" style="background:var(--purple);border:none;color:white;padding:12px 28px;border-radius:8px;font-size:14px;font-family:sans-serif;font-weight:bold;cursor:pointer;">Go to My Group's Video →</button>
+  </div>
+</div>
+
+<!-- ══════════ OVERVIEW ══════════ -->
+<div id="sec-overview">
+  <div class="time-tag">⏱ JBC 3 · Week 3 of Practicum</div>
+  <div class="section-title">What Do You See? — Video Observation Activity</div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="label-gold">THE BIG IDEA</div>
+    <p class="body-text">You have been teaching for almost 3 weeks. You have tools. Now it's time to see them — or their absence — in action. Each group will watch a short video and apply the full toolkit you've built across JBC 1, JBC 2, and your Learning Environment sessions. Every lens connects. Nothing you've learned exists in isolation. And today, all of it lives inside one question from Dr. Christopher Emdin: <em style="color:var(--gold)">"Is this teacher managing scholars — or reaching them?"</em></p>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="label-gold" style="margin-bottom:12px">HOW IT WORKS</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:26px;height:26px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-family:sans-serif;font-weight:bold;color:var(--dark);flex-shrink:0">1</div>
+        <p class="body-text"><strong style="color:white">Find your group</strong> — Each group has a different video and a different primary lens.</p>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:26px;height:26px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-family:sans-serif;font-weight:bold;color:var(--dark);flex-shrink:0">2</div>
+        <p class="body-text"><strong style="color:white">Watch your video</strong> — Watch it once to enjoy it. Watch it again to analyze it.</p>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:26px;height:26px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-family:sans-serif;font-weight:bold;color:var(--dark);flex-shrink:0">3</div>
+        <p class="body-text"><strong style="color:white">Apply ALL the lenses</strong> — Your primary lens anchors the analysis. The connective lenses deepen it.</p>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:26px;height:26px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-family:sans-serif;font-weight:bold;color:var(--dark);flex-shrink:0">4</div>
+        <p class="body-text"><strong style="color:white">Report out</strong> — Each group shares their primary lens findings. Together you build the full picture.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:24px">Group Assignments at a Glance</div>
+  <table class="overview-table">
+    <thead>
+      <tr>
+        <th>GROUP</th>
+        <th>PRIMARY LENS</th>
+        <th>CONNECTIVE LENSES</th>
+        <th>ARMOR</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong style="color:#F5A623">Group 1</strong></td>
+        <td><strong style="color:#27AE60">Attention Signals</strong></td>
+        <td>Engaging Presence · Circles of Control · W.A.I.T</td>
+        <td>HELMET — Teach with Purpose</td>
+      </tr>
+      <tr>
+        <td><strong style="color:#8B5CF6">Group 2</strong></td>
+        <td><strong style="color:#8B5CF6">W.A.I.T</strong></td>
+        <td>Circles of Influence · Redirection Moves · Scholar-Centered Directions</td>
+        <td>BREASTPLATE — Listen & Learn</td>
+      </tr>
+      <tr>
+        <td><strong style="color:#0891B2">Group 3</strong></td>
+        <td><strong style="color:#0891B2">Sincere & Authentic Praise</strong></td>
+        <td>Engaging Presence · Redirection Moves · Circles of Control</td>
+        <td>BREASTPLATE — Act with Care</td>
+      </tr>
+      <tr>
+        <td><strong style="color:#C0392B">Group 4</strong></td>
+        <td><strong style="color:#C0392B">Circles of Influence</strong></td>
+        <td>W.A.I.T · Redirection Moves · The Ecosystem</td>
+        <td>SWORD — Own Your Role as a Change Agent</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="label-gold">⏱ TIMING</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+        <div class="body-text">Watch + Analyze: <strong style="color:white">15 min</strong></div>
+        <div class="body-text">Prepare Report Out: <strong style="color:white">5 min</strong></div>
+        <div class="body-text">Each Group Reports: <strong style="color:white">3–4 min each</strong></div>
+        <div class="body-text">Whole Group Debrief: <strong style="color:white">10 min</strong></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label-gold">📓 CM WORKBOOK</div>
+      <p class="body-text" style="margin-top:4px">Record your observations in your CM Workbook as you go. Your notes are the raw material for your report out AND your personal Warrior Move at the close.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MY GROUP'S VIDEO ══════════ -->
+<div id="sec-group" class="hidden">
+  <div class="time-tag">⏱ Breakout Room Activity — 20 min</div>
+  <div class="section-title">My Group's Video</div>
+  <p class="body-text" style="margin-bottom:20px">Select your group below to load your video and observation guide.</p>
+
+  <div class="group-selector">
+    <div class="group-btn" style="border-color:#27AE60" id="gbtn-1" onclick="selectGroup(1)">
+      <div class="group-num" style="color:#27AE60">1</div>
+      <div class="group-name">Group 1</div>
+      <div class="group-primary" style="color:#27AE60">🎯 Attention Signals</div>
+    </div>
+    <div class="group-btn" style="border-color:#8B5CF6" id="gbtn-2" onclick="selectGroup(2)">
+      <div class="group-num" style="color:#8B5CF6">2</div>
+      <div class="group-name">Group 2</div>
+      <div class="group-primary" style="color:#8B5CF6">⏸ W.A.I.T</div>
+    </div>
+    <div class="group-btn" style="border-color:#0891B2" id="gbtn-3" onclick="selectGroup(3)">
+      <div class="group-num" style="color:#0891B2">3</div>
+      <div class="group-name">Group 3</div>
+      <div class="group-primary" style="color:#0891B2">🙌 Sincere & Authentic Praise</div>
+    </div>
+    <div class="group-btn" style="border-color:#C0392B" id="gbtn-4" onclick="selectGroup(4)">
+      <div class="group-num" style="color:#C0392B">4</div>
+      <div class="group-name">Group 4</div>
+      <div class="group-primary" style="color:#C0392B">⭕ Circles of Influence</div>
+    </div>
+  </div>
+
+  <div id="group-content" class="hidden"></div>
+</div>
+
+<!-- ══════════ REPORT OUT ══════════ -->
+<div id="sec-reportout" class="hidden">
+  <div class="time-tag">⏱ Whole Group — 12–16 min</div>
+  <div class="section-title">Report Out — Each Group Shares</div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="label-gold">STRUCTURE FOR EACH GROUP (3–4 min)</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+      <div style="display:flex;gap:10px"><div style="color:var(--gold);font-family:sans-serif;font-weight:bold;min-width:20px">1.</div><p class="body-text"><strong style="color:white">What did you see?</strong> Give a 30-second summary of the video for groups who didn't watch it.</p></div>
+      <div style="display:flex;gap:10px"><div style="color:var(--gold);font-family:sans-serif;font-weight:bold;min-width:20px">2.</div><p class="body-text"><strong style="color:white">Primary lens finding:</strong> What did your lens reveal that others might have missed?</p></div>
+      <div style="display:flex;gap:10px"><div style="color:var(--gold);font-family:sans-serif;font-weight:bold;min-width:20px">3.</div><p class="body-text"><strong style="color:white">The connection:</strong> Which connective lens surprised you most — and why?</p></div>
+      <div style="display:flex;gap:10px"><div style="color:var(--gold);font-family:sans-serif;font-weight:bold;min-width:20px">4.</div><p class="body-text"><strong style="color:white">The transfer:</strong> Name ONE thing you're taking back to your classroom tomorrow.</p></div>
+    </div>
+  </div>
+
+  <div class="report-card" style="border-color:#27AE60;background:rgba(39,174,96,0.08)">
+    <div class="report-title" style="color:#27AE60">Group 1 — Attention Signals</div>
+    <div class="report-prompt" style="border-color:#27AE60">What attention signals were used — or completely absent? What was the cost of that absence?</div>
+    <div class="report-prompt" style="border-color:#27AE60">How did the lack of a consistent signal connect to what happened with the teacher's engaging presence?</div>
+    <div class="report-prompt" style="border-color:#27AE60">What signal would YOU use in that room — and what would you do differently from the jump?</div>
+  </div>
+
+  <div class="report-card" style="border-color:#8B5CF6;background:rgba(139,92,246,0.08)">
+    <div class="report-title" style="color:#8B5CF6">Group 2 — W.A.I.T</div>
+    <div class="report-prompt" style="border-color:#8B5CF6">What was the teacher NOTICING vs. what story were they telling themselves?</div>
+    <div class="report-prompt" style="border-color:#8B5CF6">What assumptions drove the teacher's responses — and what did those assumptions cost the scholars?</div>
+    <div class="report-prompt" style="border-color:#8B5CF6">What ONE question, asked with genuine curiosity, could have changed the trajectory?</div>
+  </div>
+
+  <div class="report-card" style="border-color:#0891B2;background:rgba(8,145,178,0.08)">
+    <div class="report-title" style="color:#0891B2">Group 3 — Sincere & Authentic Praise</div>
+    <div class="report-prompt" style="border-color:#0891B2">Where were the missed opportunities for sincere and authentic praise — even in a chaotic moment?</div>
+    <div class="report-prompt" style="border-color:#0891B2">When the teacher DID acknowledge scholars, was it tied to actions or traits? Sincere or performative?</div>
+    <div class="report-prompt" style="border-color:#0891B2">Write one example of sincere and authentic praise that would have worked in that specific moment.</div>
+  </div>
+
+  <div class="report-card" style="border-color:#C0392B;background:rgba(192,57,43,0.08)">
+    <div class="report-title" style="color:#C0392B">Group 4 — Circles of Influence</div>
+    <div class="report-prompt" style="border-color:#C0392B">Map what you saw: What was in the teacher's Circle of Control? What were they treating as Control that was actually Concern?</div>
+    <div class="report-prompt" style="border-color:#C0392B">What was in the teacher's Circle of Influence that they never tapped?</div>
+    <div class="report-prompt" style="border-color:#C0392B">Name one Ecosystem-level factor that might have been shaping what you saw — even if the video didn't show it.</div>
+  </div>
+</div>
+
+<!-- ══════════ WHOLE GROUP DEBRIEF ══════════ -->
+<div id="sec-debrief" class="hidden">
+  <div class="time-tag">⏱ Whole Group — 10 min</div>
+  <div class="section-title">Whole Group Debrief</div>
+
+  <p class="body-text" style="margin-bottom:18px">These questions pull across ALL four groups. The goal is to build one complete picture from four different lenses.</p>
+
+  <div class="debrief-q">
+    <div class="label-gold" style="margin-bottom:4px">CONNECTION 1 — Everything Is Linked</div>
+    <p class="body-text" style="color:white">Group 1 saw missing attention signals. Group 4 saw a teacher living in their Circle of Concern. How are these the SAME problem — just seen from different angles?</p>
+  </div>
+
+  <div class="debrief-q">
+    <div class="label-gold" style="margin-bottom:4px">CONNECTION 2 — W.A.I.T Before Everything Else</div>
+    <p class="body-text" style="color:white">Group 2 applied W.A.I.T to the teacher's assumptions. How does W.A.I.T show up — or fail to show up — in the moments Groups 1, 3, and 4 analyzed too?</p>
+  </div>
+
+  <div class="debrief-q">
+    <div class="label-gold" style="margin-bottom:4px">CONNECTION 3 — The Praise That Wasn't There</div>
+    <p class="body-text" style="color:white">Group 3 identified missed praise opportunities. How might ONE moment of sincere and authentic praise have changed the trajectory of what Groups 1, 2, and 4 analyzed?</p>
+  </div>
+
+  <div class="debrief-q">
+    <div class="label-gold" style="margin-bottom:4px">CONNECTION 4 — The Honest Mirror</div>
+    <p class="body-text" style="color:white">You've been teaching for 3 weeks. Without naming names — which moment in any of these videos felt closest to something you've experienced or done yourself?</p>
+  </div>
+
+  <div class="debrief-q">
+    <div class="label-gold" style="margin-bottom:4px">CONNECTION 5 — The Transfer</div>
+    <p class="body-text" style="color:white">What is ONE concrete move — grounded in any of the four lenses — that you are committing to try before Practicum ends?</p>
+  </div>
+
+  <div class="card" style="border-left:4px solid var(--mid);margin-top:18px">
+    <div class="label-gold">🔄 RJ CONNECTION</div>
+    <p class="body-text">In every video, there were scholars whose learning was interrupted. Restorative Justice asks: <em style="color:white">Who was harmed? What do they need? Who is responsible for repair?</em> That's not just a question for the teacher in the video. It's a question for all of us, every day.</p>
+  </div>
+</div>
+
+<!-- ══════════ WARRIOR MOVE ══════════ -->
+<div id="sec-warrior" class="hidden">
+  <div class="time-tag">⏱ Individual Reflection — 5 min</div>
+  <div class="section-title">Your Warrior Move</div>
+
+  <p class="body-text" style="margin-bottom:18px">You didn't just watch those videos. You analyzed them through tools you've been building for 3 weeks. Now it's time to turn the lens on yourself — with the same curiosity you brought to the screen.</p>
+
+  <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:22px">
+
+    <div class="obs-question" style="border-color:var(--gold)">
+      <div class="obs-q-label" style="color:var(--gold)">STEP 1 — NOTICE</div>
+      <div class="obs-q-text">Think about your classroom this week. What is ONE moment — messy, unresolved, or still sitting with you — that you are ready to look at differently?</div>
+      <div class="obs-q-sub">Write it in your CM Workbook. Just the facts — no story yet.</div>
+    </div>
+
+    <div class="obs-question" style="border-color:#27AE60">
+      <div class="obs-q-label" style="color:#27AE60">STEP 2 — APPLY W.A.I.T</div>
+      <div class="obs-q-text">W — What did you actually notice? A — What assumptions did you make? I — What would you wonder if you led with curiosity? T — What does trying curiosity first look like for YOU in this moment?</div>
+    </div>
+
+    <div class="obs-question" style="border-color:#8B5CF6">
+      <div class="obs-q-label" style="color:#8B5CF6">STEP 3 — MAP YOUR CIRCLES</div>
+      <div class="obs-q-text">What is in your Circle of Control right now? What relationship in your Circle of Influence haven't you tapped yet? What are you treating as Concern that you could actually influence?</div>
+    </div>
+
+    <div class="obs-question" style="border-color:var(--teal)">
+      <div class="obs-q-label" style="color:var(--teal)">STEP 4 — NAME YOUR MOVE (YOUR FIRST ACT OF REALITY PEDAGOGY)</div>
+      <div class="obs-q-text">Based on what you saw in the videos AND what you just reflected on — what is the ONE move you are committing to before Practicum ends? Be specific. Name the scholar. Name the moment. Name the tool. This is not just a Warrior Move — this is your first step into Reality Pedagogy. Co-teaching. Dialogue. Reaching instead of managing.</div>
+      <div class="obs-q-sub">This is your Warrior Move. Record it in your CM Workbook. We're holding you to it. ⚔️</div>
+    </div>
+
+    <div class="obs-question" style="border-color:#C0392B">
+      <div class="obs-q-label" style="color:#C0392B">STEP 5 — THE 3 A's</div>
+      <div class="obs-q-text">Close with one of the 3 A's. Aha: What shifted for you today? Appreciation: Who or what are you grateful for — specifically? Apology: What are you owning — and what is your forward commitment?</div>
+      <div class="obs-q-sub">Remember — an apology without a commitment is just a statement. A warrior names the move.</div>
+    </div>
+
+  </div>
+
+  <div class="warrior-move">
+    <div style="font-size:26px;margin-bottom:8px">⚔️</div>
+    <div style="font-size:16px;font-weight:bold;color:var(--gold);margin-bottom:6px">The tools don't work if they stay in the session.</div>
+    <div style="font-size:13px;font-family:sans-serif;color:var(--light);margin-bottom:8px">You watched. You analyzed. You reflected. Now go teach like a warrior.</div>
+    <div style="font-size:13px;font-family:sans-serif;color:var(--gold);font-style:italic;margin-bottom:8px">"The classroom can serve as an example of what the world should look like — rather than a replication of what it is." — Dr. Emdin</div>
+    <div style="font-size:10px;font-family:sans-serif;color:var(--muted)">© 2026 Teach For America · JBC 3 · Pre-Service Summer · Dr. Sallee</div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+const GROUPS = {
+  1: {
+    color: '#27AE60',
+    name: 'Group 1',
+    videoUrl: 'https://youtube.com/shorts/sweNwrMSDOw?si=XnSrmy8oxjoJQX8c',
+    embedId: 'sweNwrMSDOw',
+    isShort: true,
+    primaryLens: 'Attention Signals',
+    primaryIcon: '🎯',
+    armor: 'HELMET — Teach with Purpose · Engage in Continuous Growth',
+    sel: 'Self-Management · Social Awareness',
+    skill21: 'Communication · Critical Thinking',
+    rj: 'Community Building — A classroom without signals is a classroom without shared agreements',
+    lenses: [
+      {
+        key: 'primary',
+        label: '🎯 Attention Signals',
+        color: '#27AE60',
+        isPrimary: true,
+        questions: [
+          { q: 'What attention signal — if any — did the teacher use? Was it established, consistent, or improvised in the moment?', sub: 'Look for: countdowns, call-and-response, hand signals, verbal cues, clapping patterns' },
+          { q: 'At what point did the teacher lose the group\'s attention — and what signal could have prevented that moment?', sub: 'Be specific: timestamp it if you can' },
+          { q: 'Design the attention signal you would use in THIS classroom. What would it be, and how would you introduce it from Day 1?', sub: 'Think about the age group, the energy in the room, and what would feel authentic to you' },
+          { q: 'What would a scholar-centered attention signal look and sound like — one that gives scholars agency in the process?', sub: 'Connection to RJ: shared agreements start on Day 1' },
+        ]
+      },
+      {
+        key: 'presence',
+        label: '🔥 Engaging Presence',
+        color: '#F5A623',
+        isPrimary: false,
+        questions: [
+          { q: 'How did the teacher\'s body language, voice, and movement either sustain or lose the room?', sub: 'Voice: volume, tone, pace · Body: proximity, facial expression, stillness vs. movement' },
+          { q: 'Was there a moment where a stronger engaging presence — not louder, not angrier — could have shifted the energy?', sub: 'Presence is not volume. It\'s intentionality.' },
+          { q: 'What did the scholars\' energy tell you about the teacher\'s presence? Energy in a room is a mirror.', sub: '' },
+        ]
+      },
+      {
+        key: 'control',
+        label: '⭕ Circle of Control',
+        color: '#7B4FBF',
+        isPrimary: false,
+        questions: [
+          { q: 'What did the teacher actually have direct control over in this moment — that they may not have used?', sub: 'Their tone · Their positioning · Their silence · Their next move' },
+          { q: 'What were they trying to control that was actually in their Circle of Concern?', sub: 'Other scholars\' reactions · The "mood" in the room · What happened before class' },
+          { q: 'If the teacher had stayed in their Circle of Control, what would the scene have looked like differently?', sub: '' },
+        ]
+      },
+      {
+        key: 'wait',
+        label: '⏸ W.A.I.T',
+        color: '#8B5CF6',
+        isPrimary: false,
+        questions: [
+          { q: 'What was the teacher NOTICING — and what story were they telling themselves about what they were seeing?', sub: 'Facts vs. interpretations' },
+          { q: 'What assumptions drove their response to the group?', sub: 'Did they assume the scholars were deliberately disrespecting them? What other explanations exist?' },
+          { q: 'What ONE question, asked with genuine curiosity, could have changed everything?', sub: '' },
+        ]
+      },
+    ]
+  },
+  2: {
+    color: '#8B5CF6',
+    name: 'Group 2',
+    videoUrl: 'https://youtu.be/n6fS73AFnnk?si=Fb9uArxbW_KQeP4V',
+    embedId: 'n6fS73AFnnk',
+    isShort: false,
+    primaryLens: 'W.A.I.T',
+    primaryIcon: '⏸',
+    armor: 'BREASTPLATE — Listen & Learn · Act with Care',
+    sel: 'Self-Awareness · Responsible Decision-Making',
+    skill21: 'Critical Thinking · Communication · Empathy',
+    rj: 'Restorative Dialogue — Leading with curiosity repairs; leading with assumptions escalates',
+    lenses: [
+      {
+        key: 'primary',
+        label: '⏸ W.A.I.T',
+        color: '#8B5CF6',
+        isPrimary: true,
+        questions: [
+          { q: 'W — What was the teacher actually NOTICING? List only the observable facts — no interpretation.', sub: 'Example: "Scholar was not holding paper" — not "Scholar was being defiant"' },
+          { q: 'A — What assumptions drove the teacher\'s escalating responses? What story were they telling themselves?', sub: 'Notice how quickly the assumptions hardened into certainty' },
+          { q: 'I — What are three genuine curiosity questions the teacher could have asked INSTEAD of issuing threats?', sub: '"Caleb, what\'s going on?" is a start. Go deeper.' },
+          { q: 'T — What does trying curiosity FIRST look like in this specific moment — before the first threat is issued?', sub: 'What is the very first move the teacher could make differently?' },
+        ]
+      },
+      {
+        key: 'circles',
+        label: '⭕ Circles of Influence',
+        color: '#C0392B',
+        isPrimary: false,
+        questions: [
+          { q: 'What did the teacher have in their Circle of Control that they used — and what did they have that they never touched?', sub: 'Their tone · Economy of language · Proximity · Silence' },
+          { q: 'The teacher sent Caleb to the office. Was that a move of Control, Influence, or Concern? What does that tell you?', sub: '' },
+          { q: 'What relationships in the Circle of Influence could have been activated BEFORE this moment escalated?', sub: 'A counselor · A previous conversation with Caleb · A family contact' },
+        ]
+      },
+      {
+        key: 'redirection',
+        label: '↩️ Redirection Moves',
+        color: '#F5A623',
+        isPrimary: false,
+        questions: [
+          { q: 'The Protocol says: try two redirection moves before consequences. What were the teacher\'s first two moves — and did they qualify as redirection?', sub: 'Look for: proximity, noticing & naming, one-on-one conversation, economy of language' },
+          { q: 'At what point did the teacher skip a step — and what was the cost to Caleb AND to the rest of the class?', sub: 'The rest of the class is a stakeholder too' },
+          { q: 'What redirection move would you have tried first? Second? Why those?', sub: '' },
+        ]
+      },
+      {
+        key: 'directions',
+        label: '📋 Scholar-Centered Directions',
+        color: '#27AE60',
+        isPrimary: false,
+        questions: [
+          { q: 'Were the directions given before the conflict scholar-centered? Did scholars know exactly what was expected of them?', sub: 'Scholar-centered directions are specific, sequenced, and checked for understanding' },
+          { q: 'Could the conflict have started before the conflict started — because the setup wasn\'t clear enough?', sub: 'Sometimes a "defiant" scholar is a confused scholar' },
+          { q: 'Rewrite the teacher\'s opening directions using the scholar-centered format. What changes?', sub: '"When I say go, you will... [Scholar name], can you repeat the directions? Ok, go."' },
+        ]
+      },
+    ]
+  },
+  3: {
+    color: '#0891B2',
+    name: 'Group 3',
+    videoUrl: 'https://youtu.be/Dd7FixvoKBw?si=FTmAT6Upl9BWfn_S',
+    embedId: 'Dd7FixvoKBw',
+    isShort: false,
+    primaryLens: 'Sincere & Authentic Praise',
+    primaryIcon: '🙌',
+    armor: 'BREASTPLATE — Act with Care · Be Authentic · Examine Who Your Scholars Are',
+    sel: 'Relationship Skills · Social Awareness',
+    skill21: 'Communication · Cultural Competency · Empathy',
+    rj: 'Circles of Care — Praise that sees the whole scholar builds the foundation for community',
+    lenses: [
+      {
+        key: 'primary',
+        label: '🙌 Sincere & Authentic Praise',
+        color: '#0891B2',
+        isPrimary: true,
+        questions: [
+          { q: 'When the teacher acknowledged scholars — was it tied to a specific action or a trait? Was it sincere or performative?', sub: 'Sincere praise: specific · action-focused · demonstrates knowledge of the scholar · communicated with engaging presence' },
+          { q: 'Identify THREE moments in the video where sincere and authentic praise could have been used — and wasn\'t. What scholar was right there, ready to be seen?', sub: 'Praise isn\'t just for the scholar being redirected — it\'s for every scholar doing the right thing right now' },
+          { q: 'Write the actual words of sincere and authentic praise for ONE of those moments. Use the formula: [Scholar name] + [specific action] + [why it matters].', sub: 'Example: "Jordan, you kept working even when the room got loud — that\'s exactly the focus we need for this task."' },
+          { q: 'How would a consistent practice of sincere and authentic praise have changed the ENERGY in that room before the disruption ever started?', sub: 'Praise is preventive. It\'s not just a response tool.' },
+        ]
+      },
+      {
+        key: 'presence',
+        label: '🔥 Engaging Presence',
+        color: '#F5A623',
+        isPrimary: false,
+        questions: [
+          { q: 'Did the teacher\'s body language and tone match the praise or redirection they were giving? What did you notice about authenticity vs. performance?', sub: 'What we say and how we say it must match for scholars to believe us' },
+          { q: 'How did the teacher\'s presence either open up or shut down the space for authentic connection with scholars?', sub: '' },
+        ]
+      },
+      {
+        key: 'redirection',
+        label: '↩️ Redirection Moves',
+        color: '#7B4FBF',
+        isPrimary: false,
+        questions: [
+          { q: 'Which redirection moves did you see attempted? Which ones were skipped?', sub: 'Proximity · Noticing & naming · 1-on-1 · Economy of language' },
+          { q: 'How does noticing and naming scholars who ARE engaged function as both a redirection move AND a form of sincere praise?', sub: '"Jessica is working quietly on her response." — This is both.' },
+        ]
+      },
+      {
+        key: 'control',
+        label: '⭕ Circle of Control',
+        color: '#27AE60',
+        isPrimary: false,
+        questions: [
+          { q: 'The teacher\'s tone, word choice, and recognition practices are all in their Circle of Control. In this video, how well did they use what was fully in their control?', sub: '' },
+          { q: 'If the teacher had used ONE form of sincere and authentic praise earlier in the scene — what might have stayed in the Circle of Control that eventually moved to Concern?', sub: '' },
+        ]
+      },
+    ]
+  },
+  4: {
+    color: '#C0392B',
+    name: 'Group 4',
+    videoUrl: 'https://youtu.be/T4ZzEyxxeXQ?si=Nx2i6voTh-28cYKW',
+    embedId: 'T4ZzEyxxeXQ',
+    isShort: false,
+    primaryLens: 'Circles of Influence',
+    primaryIcon: '⭕',
+    armor: 'SWORD — Own Your Role as a Change Agent · Speak Truth to Power',
+    sel: 'Responsible Decision-Making · Social Awareness',
+    skill21: 'Systems Thinking · Critical Thinking · Problem-Solving',
+    rj: 'Understanding Power & Structures — What forces beyond the classroom shaped what you saw?',
+    lenses: [
+      {
+        key: 'primary',
+        label: '⭕ Circles of Influence',
+        color: '#C0392B',
+        isPrimary: true,
+        questions: [
+          { q: 'Map the scene. What was clearly in the teacher\'s Circle of Control? What were they treating as Control that was actually Concern?', sub: 'Control: your tone, your next move, your questions, your silence · Concern: scholars\' home lives, the school\'s history, other people\'s choices' },
+          { q: 'What was in the teacher\'s Circle of Influence that never got activated? Name the specific relationships or strategies they could have leveraged.', sub: 'A co-teacher · A counselor · A relationship built before this moment · The class community itself' },
+          { q: 'What Circle of Concern were they spending the most energy on — and how was that draining them in real time?', sub: 'Watch for visible frustration, exasperation, helplessness — those are signs of living in Concern' },
+          { q: 'Identify one Ecosystem-level factor that might have been shaping what you saw — even if the video didn\'t show it.', sub: 'School culture · Testing pressure · Community circumstances · Historical relationships between scholars and school authority' },
+        ]
+      },
+      {
+        key: 'wait',
+        label: '⏸ W.A.I.T',
+        color: '#8B5CF6',
+        isPrimary: false,
+        questions: [
+          { q: 'How did the teacher\'s assumptions push them OUT of their Circle of Control and INTO their Circle of Concern?', sub: 'Assumptions about scholar motivation, intent, or character often land us in Concern' },
+          { q: 'What would W.A.I.T have unlocked in terms of which circle the teacher operated from?', sub: 'Curiosity keeps you in Control and Influence. Certainty pushes you toward Concern.' },
+        ]
+      },
+      {
+        key: 'redirection',
+        label: '↩️ Redirection Moves',
+        color: '#F5A623',
+        isPrimary: false,
+        questions: [
+          { q: 'Which redirection moves were tried — and in which circle do they live? (Control? Influence?)', sub: 'Proximity = Control · Noticing & naming = Control · Sending to office = moving toward Concern' },
+          { q: 'What redirection move that lives in the Circle of Influence was never tried?', sub: '' },
+        ]
+      },
+      {
+        key: 'ecosystem',
+        label: '🌍 The Ecosystem',
+        color: '#7B4FBF',
+        isPrimary: false,
+        questions: [
+          { q: 'What forces beyond the classroom wall might be shaping the scholars\' behavior in this video?', sub: 'You don\'t know — but a warrior wonders. What would you want to know before you judge?' },
+          { q: 'What Ecosystem-level forces might be shaping the TEACHER\'S behavior — their training, their school\'s culture, their own experiences?', sub: 'Warriors extend the same curiosity to adults that they extend to scholars.' },
+          { q: 'A warrior names the Ecosystem. They can\'t fix it alone — but they refuse to be complicit in it. What does that look like in your classroom?', sub: '' },
+        ]
+      },
+    ]
+  }
+};
+
+// ── NAV ──────────────────────────────────────────────────────────────────
+function showSection(id, btn) {
+  ['overview','emdin','group','reportout','debrief','warrior'].forEach(s => {
+    document.getElementById('sec-' + s).classList.add('hidden');
+  });
+  document.getElementById('sec-' + id).classList.remove('hidden');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+// ── GROUP SELECTION ───────────────────────────────────────────────────────
+let selectedGroup = null;
+let activeLens = null;
+
+function selectGroup(num) {
+  selectedGroup = num;
+  [1,2,3,4].forEach(i => {
+    const btn = document.getElementById('gbtn-' + i);
+    btn.classList.toggle('selected', i === num);
+    btn.style.boxShadow = i === num ? `0 0 20px ${GROUPS[i].color}88` : 'none';
+  });
+  renderGroupContent(num);
+  document.getElementById('group-content').classList.remove('hidden');
+}
+
+function renderGroupContent(num) {
+  const g = GROUPS[num];
+  activeLens = 'primary';
+
+  // Build embed URL
+  const embedUrl = g.isShort
+    ? `https://www.youtube.com/embed/${g.embedId}`
+    : `https://www.youtube.com/embed/${g.embedId}`;
+
+  const lensTabsHtml = g.lenses.map(l => `
+    <button class="lens-tab${l.isPrimary ? ' primary-tab' : ''} ${l.key === 'primary' ? 'active' : ''}"
+      style="border-color:${l.color};${l.key === 'primary' ? `background:${l.color}33;color:white` : ''}"
+      id="ltab-${l.key}"
+      onclick="switchLens('${l.key}',${num})">
+      ${l.label}${l.isPrimary ? '<span class="primary-badge">PRIMARY</span>' : ''}
+    </button>`).join('');
+
+  const tagsHtml = `
+    <div class="tag-row">
+      <span class="tag" style="color:${g.color};border-color:${g.color};background:${g.color}18">${g.primaryIcon} PRIMARY: ${g.primaryLens}</span>
+      <span class="tag" style="color:#F5A623;border-color:#F5A623;background:#F5A62318">⚔️ ${g.armor}</span>
+      <span class="tag" style="color:#8B5CF6;border-color:#8B5CF6;background:#8B5CF618">🧠 ${g.sel}</span>
+      <span class="tag" style="color:#27AE60;border-color:#27AE60;background:#27AE6018">🌐 ${g.skill21}</span>
+      <span class="tag" style="color:#C0392B;border-color:#C0392B;background:#C0392B18">🔄 ${g.rj}</span>
+    </div>`;
+
+  document.getElementById('group-content').innerHTML = `
+    <div style="border:2px solid ${g.color};border-radius:12px;overflow:hidden;margin-bottom:16px">
+      <div style="background:${g.color};padding:12px 18px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:22px;font-weight:bold;color:white">${g.name}</div>
+        <div style="font-size:13px;color:white;font-family:sans-serif">Primary Lens: <strong>${g.primaryIcon} ${g.primaryLens}</strong></div>
+      </div>
+      <div style="padding:18px">
+        ${tagsHtml}
+        <div class="label-gold" style="margin-bottom:8px">YOUR VIDEO</div>
+        <div class="video-wrapper">
+          <iframe src="${embedUrl}" title="Group ${num} Video" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+        </div>
+        <div class="video-label">Watch once to enjoy it. Watch again to analyze it. 🎬</div>
+        <div class="label-gold" style="margin-bottom:10px">OBSERVATION GUIDE — SELECT A LENS</div>
+        <div class="lens-tabs" id="lens-tabs-${num}">${lensTabsHtml}</div>
+        <div id="lens-content-${num}"></div>
+      </div>
+    </div>`;
+
+  renderLensContent('primary', num);
+}
+
+function switchLens(key, num) {
+  activeLens = key;
+  const g = GROUPS[num];
+  g.lenses.forEach(l => {
+    const tab = document.getElementById('ltab-' + l.key);
+    if (!tab) return;
+    tab.classList.toggle('active', l.key === key);
+    if (l.key === key) {
+      tab.style.background = l.color + '33';
+      tab.style.color = 'white';
+    } else {
+      tab.style.background = 'var(--dark2)';
+      tab.style.color = 'var(--muted)';
+    }
+  });
+  renderLensContent(key, num);
+}
+
+function renderLensContent(key, num) {
+  const g = GROUPS[num];
+  const lens = g.lenses.find(l => l.key === key);
+  if (!lens) return;
+
+  const questionsHtml = lens.questions.map((q, i) => `
+    <div class="obs-question" style="border-color:${lens.color}">
+      <div class="obs-q-label" style="color:${lens.color}">QUESTION ${i + 1}${lens.isPrimary ? ' ★' : ''}</div>
+      <div class="obs-q-text">${q.q}</div>
+      ${q.sub ? `<div class="obs-q-sub">${q.sub}</div>` : ''}
+    </div>`).join('');
+
+  const primaryNote = lens.isPrimary ? `
+    <div style="background:${lens.color}22;border:1px solid ${lens.color};border-radius:8px;padding:12px;margin-bottom:14px">
+      <div style="font-size:11px;color:${lens.color};font-family:sans-serif;font-weight:bold;margin-bottom:4px">⭐ PRIMARY LENS — This is your anchor</div>
+      <p class="body-text">Work through ALL questions in this lens first. Record your answers in your CM Workbook. These are the findings you'll share in your report out.</p>
+    </div>` : `
+    <div style="background:rgba(255,255,255,0.05);border:1px solid #3B1F6B;border-radius:8px;padding:12px;margin-bottom:14px">
+      <div style="font-size:11px;color:var(--muted);font-family:sans-serif;font-weight:bold;margin-bottom:4px">CONNECTIVE LENS — Layer this on top</div>
+      <p class="body-text">After you've worked through your primary lens, use this lens to deepen the analysis. What does this perspective add to what you already found?</p>
+    </div>`;
+
+  document.getElementById('lens-content-' + num).innerHTML = primaryNote + questionsHtml;
+}
+</script>
+</body>
+</html>
